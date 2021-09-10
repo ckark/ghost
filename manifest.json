@@ -1,0 +1,15 @@
+{
+  "name": "Ghost",
+  "id": "1017135840453013129",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": ["figma"],
+  "parameterOnly": true,
+  "parameters": [
+    {
+      "name": "Color",
+      "key": "color",
+      "description": "What color would you like your ghosts to be?"
+    }
+  ]
+}
