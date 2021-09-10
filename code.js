@@ -56,11 +56,10 @@ figma.on('run', ({ parameters }) => {
         traversal(figma.currentPage.selection, all);
         all = all.flat();
         let instances = all.filter(n => n.type === 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I");
-        if (all.find(a => "INSTANCE" === a.type)) {
-            let a = new Array;
-            instances.forEach(l => a.push(l.detachInstance()));
-            let l = new Array;
-            traversal(a, l), (l = l.flat()).filter(a => "FRAME" === a.type).map(a => a.layoutMode = "NONE"), all = all.concat(l).flat();
+        ;
+        if (instances.length > 0) {
+            let [a, e, t, l] = [new Array, new Array, new Array, new Array];
+            instances.map(e => a.push(e.detachInstance())), traversal(a, e), e.flat().filter(a => "INSTANCE" === a.type).map(a => t.push(a.detachInstance())), traversal(a, l), (l = l.flat()).filter(a => "FRAME" === a.type).map(a => a.layoutMode = "NONE"), all = all.concat(l).flat();
         }
         all = all.filter(n => n.id.substr(0, 1) !== "I").filter(n => n.type !== "INSTANCE");
         let frames = all.filter(n => n.type === "FRAME" && n.parent.type !== 'PAGE');
@@ -70,9 +69,9 @@ figma.on('run', ({ parameters }) => {
             n.type === 'STAR');
         let vectors = all.filter(n => n.type === 'VECTOR');
         let text = all.filter(n => n.type === "TEXT");
-        const ghostifyFrames = (n) => {
-            n.map(e => {
-                (e.effects = [{
+        const ghostifyFrames = o => {
+            o.map(o => {
+                o.effects = [{
                         type: "DROP_SHADOW",
                         color: {
                             r: 0,
@@ -86,63 +85,41 @@ figma.on('run', ({ parameters }) => {
                         },
                         radius: 0,
                         spread: 0,
-                        visible: true,
+                        visible: !0,
                         blendMode: "NORMAL",
-                        showShadowBehindNode: true
-                    }]),
-                    (e.fills = [{
-                            type: 'SOLID',
-                            opacity: 0,
-                            color: color,
-                        },]);
-                e.strokeWeight = 0;
-                (e.strokes = [{
-                        type: 'SOLID',
+                        showShadowBehindNode: !0
+                    }], o.fills = [{
+                        type: "SOLID",
                         opacity: 0,
-                        color: color,
-                    },]);
-                e.strokeWeight = 0;
+                        color: color
+                    }], o.strokeWeight = 0, o.strokes = [{
+                        type: "SOLID",
+                        opacity: 0,
+                        color: color
+                    }], o.strokeWeight = 0;
             });
         };
         ghostifyFrames(frames);
-        const ghostifyVector = (n) => {
-            n.map((e) => {
-                e.resizeWithoutConstraints(e.width, e.height),
-                    (e.x = e.relativeTransform[0][2]),
-                    (e.y = e.relativeTransform[1][2]),
-                    (e.fills = [{
-                            type: 'SOLID',
-                            color: color,
-                        },]);
-                (e.strokes = [{
-                        type: 'SOLID',
-                        color: color,
-                    },]);
+        const ghostifyVector = o => {
+            o.map(o => {
+                o.resizeWithoutConstraints(o.width, o.height), o.x = o.relativeTransform[0][2], o.y = o.relativeTransform[1][2], o.fills = [{
+                        type: "SOLID",
+                        color: color
+                    }], o.strokes = [{
+                        type: "SOLID",
+                        color: color
+                    }];
             });
         };
         ghostifyVector(vectors);
         const ghostifyShapes = (n) => {
             const nodes = [];
-            n.map((e) => {
-                const o = figma.createRectangle();
-                if (e.type === 'ELLIPSE')
-                    o.cornerRadius = 1000;
-                o.resizeWithoutConstraints(e.width, e.height),
-                    (o.x = e.relativeTransform[0][2]),
-                    (o.y = e.relativeTransform[1][2]),
-                    (o.fills = [{
-                            type: 'SOLID',
-                            color: color,
-                        },]);
-                nodes.push(o);
-                if (e.parent.type === 'COMPONENT_SET' ||
-                    e.parent.type === 'COMPONENT' ||
-                    e.parent.type === 'PAGE') {
-                    return;
-                }
-                else {
-                    e.parent.insertChild(e.parent.children.length, o), e.remove();
-                }
+            n.map(e => {
+                const t = figma.createRectangle();
+                "ELLIPSE" === e.type && (t.cornerRadius = 1e3), t.resizeWithoutConstraints(e.width, e.height), t.x = e.relativeTransform[0][2], t.y = e.relativeTransform[1][2], t.fills = [{
+                        type: "SOLID",
+                        color: color
+                    }], nodes.push(t), "COMPONENT_SET" !== e.parent.type && "PAGE" !== e.parent.type && (e.parent.insertChild(e.parent.children.length, t), e.remove());
             });
         };
         ghostifyShapes(shapes);
@@ -151,19 +128,12 @@ figma.on('run', ({ parameters }) => {
                 let fontsize = Number(e.fontSize), height = e.height, lineHeight = e.lineHeight;
                 isNaN(lineHeight) && (lineHeight = 1.25 * fontsize);
                 const nodes = [], numberOfRectangles = Math.round(height / lineHeight);
-                let index = n.indexOf(e);
-                for (let i = 0; i < numberOfRectangles; i++) {
-                    const t = figma.createRectangle(), o = (e, t) => Math.random() * (t - e) + e;
-                    t.resizeWithoutConstraints((e.width, e.width), 0.7 * lineHeight),
-                        (t.cornerRadius = lineHeight),
-                        (t.x = e.relativeTransform[0][2]),
-                        (t.y = e.relativeTransform[1][2] + lineHeight * i),
-                        (t.fills = [{
-                                type: 'SOLID',
-                                color: color,
-                            },]),
-                        nodes.push(t),
-                        e.parent.insertChild(e.parent.children.length, t);
+                for (let t = 0; t < numberOfRectangles; t++) {
+                    const i = figma.createRectangle();
+                    i.resizeWithoutConstraints((e.width, e.width), .7 * lineHeight), i.cornerRadius = lineHeight, i.x = e.relativeTransform[0][2], i.y = e.relativeTransform[1][2] + lineHeight * t, i.fills = [{
+                            type: "SOLID",
+                            color: color
+                        }], nodes.push(i), e.parent.insertChild(e.parent.children.length, i);
                 }
                 e.remove();
             });
