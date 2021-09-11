@@ -58,12 +58,19 @@ figma.on('run', ({
 		}
 		traversal(figma.currentPage.selection, all);
 		all = all.flat();
-		let instances = all.filter(n => n.type === 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I") as InstanceNode[];;
-		if (instances.length > 0) {
-			let [a, e, t, l] = [new Array, new Array, new Array, new Array];
-			instances.map(e => a.push(e.detachInstance())), traversal(a, e), e.flat().filter(a => "INSTANCE" === a.type).map(a => t.push(a.detachInstance())), traversal(a, l), (l = l.flat()).filter(a => "FRAME" === a.type).map(a => a.layoutMode = "NONE"), all = all.concat(l).flat()
-		}
-		all = all.filter(n => n.id.substr(0, 1) !== "I").filter(n => n.type !== "INSTANCE")
+		const detach = e => {
+			let a = new Array;
+			e = e.filter(n => n.type === 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I")
+			if(e.length > 0) {
+				traversal(e.map(n => n.detachInstance()), a);
+				all.push(a.flat().filter(n => n.type !== 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I"));
+				a = a.flat().filter(n => n.type === 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I");
+				detach(a);
+				return all.flat()
+			}
+	   }
+	  	detach(all);
+		all = all.flat().filter(n => n.type !== 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I")
 		let frames = all.filter(n => n.type === "FRAME" && n.parent.type !== 'PAGE') as FrameNode[];
 		let shapes = all.filter(
 			n =>
