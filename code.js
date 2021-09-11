@@ -55,16 +55,14 @@ figma.on('run', ({ parameters }) => {
         };
         traversal(figma.currentPage.selection, all);
         all = all.flat();
-        const detach = e => {
-            let a = new Array;
-            e = e.filter(n => n.type === 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I");
-            if (e.length > 0) {
-                traversal(e.map(n => n.detachInstance()), a);
-                all.push(a.flat().filter(n => n.type !== 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I"));
-                a = a.flat().filter(n => n.type === 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I");
-                detach(a);
-                return all.flat();
-            }
+        const detach = t => {
+            let e = new Array;
+            if ((t = t.filter(t => "INSTANCE" === t.type).filter(t => "I" !== t.id.substr(0, 1))).length > 0)
+                return traversal(t.map(t => t.detachInstance()), e),
+                    all.push(e.flat().filter(t => "INSTANCE" !== t.type).filter(t => "I" !== t.id.substr(0, 1))),
+                    e = e.flat().filter(t => "INSTANCE" === t.type).filter(t => "I" !== t.id.substr(0, 1)),
+                    detach(e),
+                    all.flat();
         };
         detach(all);
         all = all.flat().filter(n => n.type !== 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I");
