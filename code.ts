@@ -137,7 +137,8 @@ figma.on("run", ({ parameters }: RunEvent) => {
 							color: color,
 						},
 					]),
-					(o.strokeWeight = 0);
+					(o.strokeWeight = 0),
+					(o.cornerRadius = o.cornerRadius);
 			});
 		};
 		ghostifyNonImages(nonimages);
@@ -178,7 +179,8 @@ figma.on("run", ({ parameters }: RunEvent) => {
 							color: color,
 						},
 					]),
-					(o.strokeWeight = 0);
+					(o.strokeWeight = 0),
+					(o.cornerRadius = o.cornerRadius);
 			});
 		};
 		ghostifyImages(images);
@@ -207,6 +209,7 @@ figma.on("run", ({ parameters }: RunEvent) => {
 			n.map((e) => {
 				const t = figma.createRectangle();
 				"ELLIPSE" === e.type && (t.cornerRadius = 1e3),
+					(t.cornerRadius = e.cornerRadius),
 					t.resizeWithoutConstraints(e.width, e.height),
 					(t.x = e.relativeTransform[0][2]),
 					(t.y = e.relativeTransform[1][2]),
