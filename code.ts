@@ -33,6 +33,7 @@ figma.on('run', ({
 		let all = new Array();
 		const traversal = (e, f) => {
 			let count = 0;
+
 			function* read(nodes) {
 				const len = nodes.length;
 				if (len === 0) {
@@ -67,8 +68,16 @@ figma.on('run', ({
 					all.flat()
 		};
 		detach(all);
-		all = all.flat().filter(n => n.type !== 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I")
-		let frames = all.filter(n => n.type === "FRAME" && n.parent.type !== 'PAGE') as FrameNode[];
+		all = all.flat().filter(n => n.type !== 'INSTANCE').filter(n => n.id.substr(0, 1) !== "I");
+		let frames = all.filter(n => n.type === "FRAME" && n.parent.type !== 'PAGE');
+		let images = new Array,
+			nonimages = new Array;
+		frames.map(e => {
+			e.fills.map(a => {
+				a.type;
+				"IMAGE" === a.type ? images.push(e) : nonimages.push(e)
+			})
+		});
 		let shapes = all.filter(
 			n =>
 			n.type === 'ELLIPSE' ||
@@ -78,7 +87,7 @@ figma.on('run', ({
 		) as SceneNode[];
 		let vectors = all.filter(n => n.type === 'VECTOR') as VectorNode[];
 		let text = all.filter(n => n.type === "TEXT") as TextNode[];
-		const ghostifyFrames = o => {
+		const ghostifyNonImages = o => {
 			o.map(o => {
 				o.effects = [{
 					type: "DROP_SHADOW",
@@ -108,7 +117,38 @@ figma.on('run', ({
 				}], o.strokeWeight = 0
 			})
 		};
-		ghostifyFrames(frames);
+		ghostifyNonImages(nonimages);
+		const ghostifyImages = o => {
+			o.map(o => {
+				o.effects = [{
+					type: "DROP_SHADOW",
+					color: {
+						r: 0,
+						g: 0,
+						b: 0,
+						a: 0
+					},
+					offset: {
+						x: 0,
+						y: 0
+					},
+					radius: 0,
+					spread: 0,
+					visible: !0,
+					blendMode: "NORMAL",
+					showShadowBehindNode: !0
+				}], o.fills = [{
+					type: "SOLID",
+					opacity: 1,
+					color: color
+				}], o.strokeWeight = 0, o.strokes = [{
+					type: "SOLID",
+					opacity: 0,
+					color: color
+				}], o.strokeWeight = 0
+			})
+		};
+		ghostifyImages(images);
 		const ghostifyVector = o => {
 			o.map(o => {
 				o.resizeWithoutConstraints(o.width, o.height), o.x = o.relativeTransform[0][2], o.y = o.relativeTransform[1][2], o.fills = [{
