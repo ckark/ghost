@@ -90,7 +90,7 @@ figma.on('run', ({
 					},
 					offset: {
 						x: 0,
-						y: 2
+						y: 0
 					},
 					radius: 0,
 					spread: 0,
