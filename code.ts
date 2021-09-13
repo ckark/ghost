@@ -162,7 +162,7 @@ figma.on('run', ({
 					(frame) => frame.type === 'FRAME' && frame.parent.type === 'PAGE',
 				) as FrameNode[],
 			);
-			frames.map(e => e.layoutMode = 'NONE')
+			frames.map(e => e.layoutMode = 'NONE');
 			0 != topframes.length &&
 				0 != nest.length &&
 				nest.map((a) => {
