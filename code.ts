@@ -282,6 +282,7 @@ figma.on("run", ({ parameters }: RunEvent) => {
 			}
 		};
 		nest();
+		console.clear();
 		figma.closePlugin("ghostified");
 	}
 });

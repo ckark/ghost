@@ -260,6 +260,7 @@ figma.on("run", ({ parameters }) => {
             }
         };
         nest();
+        console.clear();
         figma.closePlugin("ghostified");
     }
 });
