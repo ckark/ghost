@@ -95,11 +95,13 @@ figma.on("run", ({ parameters }: RunEvent) => {
 				"IMAGE" === a.type ? images.push(e) : nonimages.push(e);
 			});
 		});
+		frames.map((e) => (e.layoutMode = "NONE"));
 		let shapes = all.filter(
 			(n) => n.type === "ELLIPSE" || n.type === "POLYGON" || n.type === "RECTANGLE" || n.type === "STAR"
 		) as SceneNode[];
 		let vectors = all.filter((n) => n.type === "VECTOR") as VectorNode[];
 		let text = all.filter((n) => n.type === "TEXT") as TextNode[];
+		const nodes: SceneNode[] = [];
 		const ghostifyNonImages = (o) => {
 			o.map((o) => {
 				(o.effects = [
@@ -184,26 +186,23 @@ figma.on("run", ({ parameters }: RunEvent) => {
 		ghostifyImages(images);
 		const ghostifyVector = (o) => {
 			o.map((o) => {
-				o.resizeWithoutConstraints(o.width, o.height),
-					(o.x = o.relativeTransform[0][2]),
-					(o.y = o.relativeTransform[1][2]),
-					(o.fills = [
-						{
-							type: "SOLID",
-							color: color,
-						},
-					]),
+				(o.fills = [
+					{
+						type: "SOLID",
+						color: color,
+					},
+				]),
 					(o.strokes = [
 						{
 							type: "SOLID",
 							color: color,
 						},
 					]);
+				nodes.push(o);
 			});
 		};
 		ghostifyVector(vectors);
 		const ghostifyShapes = (n) => {
-			const nodes: SceneNode[] = [];
 			n.map((e) => {
 				const t = figma.createRectangle();
 				"ELLIPSE" === e.type && (t.cornerRadius = 1e3),
@@ -230,8 +229,7 @@ figma.on("run", ({ parameters }: RunEvent) => {
 					height = e.height,
 					lineHeight = e.lineHeight;
 				isNaN(lineHeight) && (lineHeight = 1.25 * fontsize);
-				const nodes: SceneNode[] = [],
-					numberOfRectangles = Math.round(height / lineHeight);
+				const numberOfRectangles = Math.round(height / lineHeight);
 				for (let t = 0; t < numberOfRectangles; t++) {
 					const i = figma.createRectangle();
 					i.resizeWithoutConstraints((e.width, e.width), 0.7 * lineHeight),
@@ -251,37 +249,6 @@ figma.on("run", ({ parameters }: RunEvent) => {
 			});
 		};
 		ghostifyText(text);
-		const nest = () => {
-			const nest = Array.from(figma.currentPage.findAll((item) => item.parent.type === "PAGE") as SceneNode[]);
-			const topframes = Array.from(
-				figma.currentPage.findAll(
-					(frame) => frame.type === "FRAME" && frame.parent.type === "PAGE"
-				) as FrameNode[]
-			);
-			frames.map((e) => (e.layoutMode = "NONE"));
-			0 != topframes.length &&
-				0 != nest.length &&
-				nest.map((a) => {
-					topframes.map((e) => {
-						if (!0 === overlap(a, e) && a.id != e.id) {
-							let t = Math.abs(e.x - a.x),
-								h = Math.abs(e.y - a.y);
-							e.appendChild(a), (a.x = t), (a.y = h);
-						}
-					});
-				});
-
-			function overlap(e, h) {
-				return (
-					e.parent.children.indexOf(e) > h.parent.children.indexOf(h) &&
-					e.x >= h.x &&
-					e.x + e.width <= h.x + h.width &&
-					e.y >= h.y &&
-					e.y + e.height <= h.y + h.height
-				);
-			}
-		};
-		nest();
 		console.clear();
 		figma.closePlugin("ghostified");
 	}
