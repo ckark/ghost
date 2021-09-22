@@ -34,7 +34,6 @@ figma.on("run", ({ parameters }: RunEvent) => {
 		let all = new Array();
 		const traversal = (e, f) => {
 			let count = 0;
-
 			function* read(nodes) {
 				const len = nodes.length;
 				if (len === 0) {
