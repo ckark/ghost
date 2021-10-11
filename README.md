@@ -15,7 +15,7 @@ To general a layout faithful to the original, Ghost removes auto-layout, thereby
 
 ## Recommended Usage
 
-Loading is a state specific design akin to `disabled` or `destrutive`, `hover` or `active`. Create a ghostified loading variant.
+Loading is a state specific design akin to `disabled` or `destructive`, `hover` or `active`. Create a ghostified loading variant.
 
 ## Roadmap
 
