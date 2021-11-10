@@ -7,6 +7,11 @@
 	"parameterOnly": true,
 	"parameters": [
 		{
+			"name": "Type",
+			"key": "type",
+			"description": "Would you like the color to be solid or a linear gradient?"
+		},
+		{
 			"name": "Color",
 			"key": "color",
 			"description": "What color would you like your ghosts to be?"
