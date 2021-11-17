@@ -144,6 +144,7 @@ figma.on("run", ({ parameters }: RunEvent) => {
 		let vectors = all.filter((n) => n.type === "VECTOR") as VectorNode[];
 		let text = all.filter((n) => n.type === "TEXT") as TextNode[];
 		const nodes: SceneNode[] = [];
+
 		const ghostifyNonImages = (e) => {
 			e.map((e) => {
 				(e.effects = [
@@ -163,7 +164,7 @@ figma.on("run", ({ parameters }: RunEvent) => {
 					(e.strokes = [{ type: "SOLID", opacity: 0, color: { r: 0, g: 0, b: 0 } }]);
 			});
 		};
-		ghostifyNonImages(nonimages);
+
 		const ghostifyImages = (e) => {
 			e.map((e) => {
 				(e.effects = [
@@ -184,7 +185,7 @@ figma.on("run", ({ parameters }: RunEvent) => {
 					nodes.push(e);
 			});
 		};
-		ghostifyImages(images);
+
 		const ghostifyVector = (e) => {
 			e.map((e) => {
 				(e.fills = fills),
@@ -193,7 +194,7 @@ figma.on("run", ({ parameters }: RunEvent) => {
 					nodes.push(e);
 			});
 		};
-		ghostifyVector(vectors);
+
 		const ghostifyShapes = (e) => {
 			e.map((e) => {
 				const t = figma.createRectangle();
@@ -211,27 +212,42 @@ figma.on("run", ({ parameters }: RunEvent) => {
 						(e.parent.insertChild(e.parent.children.length, t), e.remove());
 			});
 		};
-		ghostifyShapes(shapes);
-		const ghostifyText = (e) => {
-			e.map((e) => {
-				let t = Number(e.fontSize),
-					s = e.height,
-					o = e.lineHeight;
-				isNaN(o) && (o = 1.25 * t);
-				const i = Math.round(s / o);
-				for (let t = 0; t < i; t++) {
-					const s = figma.createRectangle();
-					s.resizeWithoutConstraints((e.width, e.width), 0.7 * o),
-						(s.cornerRadius = o),
-						(s.x = e.relativeTransform[0][2]),
-						(s.y = e.relativeTransform[1][2] + o * t),
-						(s.fills = fills),
-						nodes.push(s),
-						e.parent.insertChild(e.parent.children.length, s);
-				}
-				e.remove();
-			});
-		};
-		ghostifyText(text), console.clear(), figma.closePlugin("ghostified");
+
+		const ghostifyText = (e) =>
+				new Promise((t) => {
+					e.map(async (e) => {
+						await figma.loadFontAsync(e.fontName as FontName);
+						(e.textAutoResize = "WIDTH_AND_HEIGHT"),
+							!0 === e.hasMissingFont &&
+								figma.closePlugin("You can't convert text until loading the font on which it's based");
+						let t = Number(e.fontSize),
+							i = e.height,
+							s = e.lineHeight;
+						isNaN(s) && (s = 1.25 * t);
+						const o = Math.round(i / s);
+						for (let t = 0; t < o; t++) {
+							const i = figma.createRectangle();
+							i.resizeWithoutConstraints((e.width, e.width), 0.7 * s),
+								(i.cornerRadius = s),
+								(i.x = e.relativeTransform[0][2]),
+								(i.y = e.relativeTransform[1][2] + s * t),
+								(i.fills = fills),
+								nodes.push(i),
+								e.parent.insertChild(e.parent.children.length, i),
+								e.remove();
+						}
+					}),
+						setTimeout(() => t("done"), 0);
+				}),
+			ghostify = async () => {
+				ghostifyNonImages(nonimages),
+					ghostifyImages(images),
+					ghostifyVector(vectors),
+					ghostifyShapes(shapes),
+					await ghostifyText(text),
+					console.clear,
+					figma.closePlugin("ghostified");
+			};
+		ghostify();
 	}
 });
