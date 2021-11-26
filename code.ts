@@ -212,7 +212,12 @@ figma.on("run", ({ parameters }: RunEvent) => {
 			(n) => n.type === "ELLIPSE" || n.type === "POLYGON" || n.type === "RECTANGLE" || n.type === "STAR"
 		) as SceneNode[],
 		vectors = all.filter((n) => n.type === "VECTOR") as VectorNode[],
-		text = all.filter((n) => n.type === "TEXT") as TextNode[];
+		text = all.filter((n) => n.type === "TEXT") as TextNode[],
+		parentFrame = all.filter((e) => "FRAME" === e.type && "PAGE" === e.parent.type),
+		nonFrames = new Array();
+		nonFrames.map(e=> e.push(all.filter((n) => n.type !== "FRAME")));
+		parentFrame.map((e) => {e.appendChild(nonFrames.flat())});
+		frames.map((e) => {e.remove()});
 	const nodes: SceneNode[] = [],
 		ghostifyNonImages = (e) => {
 			e.map((e) => {
