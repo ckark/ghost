@@ -458,8 +458,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 				ghostifyVector(vectors),
 				ghostifyShapes(shapes),
 				await ghostifyText(text),
-				console.clear,
-				figma.closePlugin('ghostified');
+				console.log(nodes);
 		};
 	ghostify();
 });
