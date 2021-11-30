@@ -14,7 +14,8 @@ figma.parameters.on('input', ({ key, query, result }: ParameterInputEvent) => {
 	}
 });
 figma.on('run', ({ parameters }: RunEvent) => {
-	0 === figma.currentPage.selection.length && (figma.notify('Select at least one item.'), figma.closePlugin());
+	0 === figma.currentPage.selection.length &&
+		(figma.notify('Select at least one item.'), figma.closePlugin());
 	parameters &&
 		'Gray' === parameters.color &&
 		'Solid' === parameters.type &&
@@ -174,7 +175,11 @@ figma.on('run', ({ parameters }: RunEvent) => {
 	traversal(figma.currentPage.selection, all), (all = all.flat());
 	const detach = (e) => {
 		let t = new Array();
-		if ((e = e.filter((e) => 'INSTANCE' === e.type).filter((e) => 'I' !== e.id.substr(0, 1))).length > 0)
+		if (
+			(e = e
+				.filter((e) => 'INSTANCE' === e.type)
+				.filter((e) => 'I' !== e.id.substr(0, 1))).length > 0
+		)
 			return (
 				traversal(
 					e.map((e) => e.detachInstance()),
@@ -208,7 +213,13 @@ figma.on('run', ({ parameters }: RunEvent) => {
 		});
 	}),
 		frames.map((e) => (e.layoutMode = 'NONE'));
-	let shapes = all.filter((n) => n.type === 'ELLIPSE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'STAR') as SceneNode[],
+	let shapes = all.filter(
+			(n) =>
+				n.type === 'ELLIPSE' ||
+				n.type === 'POLYGON' ||
+				n.type === 'RECTANGLE' ||
+				n.type === 'STAR',
+		) as SceneNode[],
 		vectors = all.filter((n) => n.type === 'VECTOR') as VectorNode[],
 		text = all.filter((n) => n.type === 'TEXT') as TextNode[];
 	const nodes: SceneNode[] = [],
@@ -340,19 +351,25 @@ figma.on('run', ({ parameters }: RunEvent) => {
 							},
 						]),
 					nodes.push(s),
-					'COMPONENT_SET' !== e.parent.type && 'PAGE' !== e.parent.type && (e.parent.insertChild(e.parent.children.length, s), e.remove());
+					'COMPONENT_SET' !== e.parent.type &&
+						'PAGE' !== e.parent.type &&
+						(e.parent.insertChild(e.parent.children.length, s), e.remove());
 			});
 		},
 		ghostifyText = (e) =>
 			new Promise((t) => {
 				e.map(async (e) => {
 					await figma.loadFontAsync(e.fontName as FontName);
-					(e.textAutoResize = 'WIDTH_AND_HEIGHT'), !0 === e.hasMissingFont && figma.closePlugin("You can't convert text until loading its source font.");
+					(e.textAutoResize = 'NONE'),
+						!0 === e.hasMissingFont &&
+							figma.closePlugin(
+								"You can't convert text until loading its source font.",
+							);
 					let t = Number(e.fontSize),
 						i = e.height,
 						s = e.lineHeight;
 					isNaN(s) && (s = 1.25 * t);
-					const o = Math.round(i / s);
+					let o = Math.round(i / s);
 					for (let t = 0; t < o; t++) {
 						const i = figma.createRectangle();
 						i.resizeWithoutConstraints(e.width, (e.height, 0.7 * s)),
@@ -368,7 +385,13 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					setTimeout(() => t('done'), 0);
 			}),
 		ghostify = async () => {
-			ghostifyNonImages(nonimages), ghostifyImages(images), ghostifyVector(vectors), ghostifyShapes(shapes), await ghostifyText(text), console.log(nodes);
+			await ghostifyText(text),
+				ghostifyNonImages(nonimages),
+				ghostifyImages(images),
+				ghostifyVector(vectors),
+				ghostifyShapes(shapes),
+				console.clear(),
+				figma.closePlugin('ghostified.');
 		};
 	ghostify();
 });
