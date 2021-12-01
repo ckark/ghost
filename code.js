@@ -14,8 +14,7 @@ figma.parameters.on('input', ({ key, query, result }) => {
 	}
 });
 figma.on('run', ({ parameters }) => {
-	0 === figma.currentPage.selection.length &&
-		(figma.notify('Select at least one item.'), figma.closePlugin());
+	0 === figma.currentPage.selection.length && (figma.notify('Select at least one item.'), figma.closePlugin());
 	parameters &&
 		'Gray' === parameters.color &&
 		'Solid' === parameters.type &&
@@ -174,11 +173,7 @@ figma.on('run', ({ parameters }) => {
 	traversal(figma.currentPage.selection, all), (all = all.flat());
 	const detach = (e) => {
 		let t = new Array();
-		if (
-			(e = e
-				.filter((e) => 'INSTANCE' === e.type)
-				.filter((e) => 'I' !== e.id.substr(0, 1))).length > 0
-		)
+		if ((e = e.filter((e) => 'INSTANCE' === e.type).filter((e) => 'I' !== e.id.substr(0, 1))).length > 0)
 			return (
 				traversal(
 					e.map((e) => e.detachInstance()),
@@ -210,15 +205,10 @@ figma.on('run', ({ parameters }) => {
 		e.fills.map((t) => {
 			t.type, 'IMAGE' === t.type ? images.push(e) : nonimages.push(e);
 		});
-	});
-	let allFrames = all.filter((e) => 'FRAME' === e.type);
-	allFrames.map((e) => (e.layoutMode = 'NONE'));
+	}),
+		frames.map((e) => (e.layoutMode = 'NONE'));
 	let shapes = all.filter(
-			(n) =>
-				n.type === 'ELLIPSE' ||
-				n.type === 'POLYGON' ||
-				n.type === 'RECTANGLE' ||
-				n.type === 'STAR',
+			(n) => n.type === 'ELLIPSE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'STAR',
 		),
 		vectors = all.filter((n) => n.type === 'VECTOR'),
 		text = all.filter((n) => n.type === 'TEXT');
@@ -359,37 +349,48 @@ figma.on('run', ({ parameters }) => {
 		ghostifyText = (e) =>
 			new Promise((t) => {
 				e.map(async (e) => {
-					await figma.loadFontAsync(e.fontName);
-					(e.textAutoResize = 'NONE'),
-						!0 === e.hasMissingFont &&
-							figma.closePlugin(
-								"You can't convert text until loading its source font.",
-							);
-					let t = Number(e.fontSize),
-						i = e.height,
-						s = e.lineHeight;
-					isNaN(s) && (s = 1.25 * t);
-					let o = Math.round(i / s);
-					for (let t = 0; t < o; t++) {
-						const i = figma.createRectangle();
-						i.resizeWithoutConstraints(e.width, (e.height, 0.7 * s)),
-							(i.cornerRadius = s),
-							(i.x = e.relativeTransform[0][2]),
-							(i.y = e.relativeTransform[1][2] + s * t),
-							(i.fills = fills),
-							nodes.push(i),
-							e.parent.insertChild(e.parent.children.length, i);
+					if (e.fontName === figma.mixed) {
+						const t = figma.createRectangle();
+						let i = e.height;
+						t.resizeWithoutConstraints(e.width, 0.7 * e.height),
+							(t.cornerRadius = i),
+							(t.x = e.relativeTransform[0][2]),
+							(t.y = e.relativeTransform[1][2]),
+							(t.fills = fills),
+							nodes.push(t),
+							e.parent.insertChild(e.parent.children.length, t),
+							e.remove();
+					} else {
+						await figma.loadFontAsync(e.fontName);
+						(e.textAutoResize = 'NONE'),
+							!0 === e.hasMissingFont &&
+								figma.closePlugin("You can't convert text until loading its source font.");
+						let t = Number(e.fontSize),
+							i = e.height,
+							n = e.lineHeight;
+						isNaN(n) && (n = 1.25 * t);
+						let r = Math.round(i / n);
+						for (let t = 0; t < r; t++) {
+							const i = figma.createRectangle();
+							i.resizeWithoutConstraints(e.width, (e.height, 0.7 * n)),
+								(i.cornerRadius = n),
+								(i.x = e.relativeTransform[0][2]),
+								(i.y = e.relativeTransform[1][2] + n * t),
+								(i.fills = fills),
+								nodes.push(i),
+								e.parent.insertChild(e.parent.children.length, i);
+						}
+						e.remove();
 					}
-					e.remove();
 				}),
 					setTimeout(() => t('done'), 0);
 			}),
 		ghostify = async () => {
-			ghostifyNonImages(nonimages),
+			await ghostifyText(text),
+				ghostifyNonImages(nonimages),
 				ghostifyImages(images),
 				ghostifyVector(vectors),
 				ghostifyShapes(shapes),
-				await ghostifyText(text),
 				console.clear(),
 				figma.closePlugin('ghostified.');
 		};
