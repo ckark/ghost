@@ -148,7 +148,6 @@ figma.on('run', ({ parameters }: RunEvent) => {
 	let all = new Array();
 	const traversal = (e, f) => {
 		let count = 0;
-
 		function* read(nodes) {
 			const len = nodes.length;
 			if (len === 0) {
@@ -199,7 +198,8 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			.flat()
 			.filter((e) => 'INSTANCE' !== e.type)
 			.filter((e) => 'I' !== e.id.substr(0, 1)));
-	let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type),
+	let topframes = all.filter((e) => 'FRAME' === e.type && 'PAGE' === e.parent.type),
+		frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type),
 		images = new Array(),
 		nonimages = new Array();
 	frames.map((e) => {
@@ -218,7 +218,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			e.map((e) => {
 				(e.effects = [
 					{
-						type: 'DROP_SHADOW',
+						type: 'DROP_SHADOW' || 'INNER_SHADOW' || 'LAYER_BLUR',
 						color: {
 							r: 0,
 							g: 0,
@@ -250,7 +250,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					(e.strokeWeight = 0),
 					(e.strokes = [
 						{
-							type: 'SOLID',
+							type: 'SOLID' || 'GRADIENT_LINEAR' || 'GRADIENT_RADIAL',
 							opacity: 0,
 							color: {
 								r: 0,
@@ -265,7 +265,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			e.map((e) => {
 				(e.effects = [
 					{
-						type: 'DROP_SHADOW',
+						type: 'DROP_SHADOW' || 'INNER_SHADOW' || 'LAYER_BLUR',
 						color: {
 							r: 0,
 							g: 0,
@@ -288,7 +288,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					0 === e.strokeWeight &&
 						(e.strokes = [
 							{
-								type: 'SOLID',
+								type: 'SOLID' || 'GRADIENT_LINEAR' || 'GRADIENT_RADIAL',
 								opacity: 0,
 								color: {
 									r: 0,
@@ -387,13 +387,14 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					setTimeout(() => t('done'), 0);
 			}),
 		ghostify = async () => {
-			await ghostifyText(text),
-				ghostifyNonImages(nonimages),
+			ghostifyNonImages(nonimages),
+				ghostifyNonImages(topframes),
 				ghostifyImages(images),
+				await ghostifyText(text),
 				ghostifyVector(vectors),
-				ghostifyShapes(shapes),
-				console.clear(),
-				figma.closePlugin('ghostified.');
+				ghostifyShapes(shapes);
+			/*console.clear(),
+				figma.closePlugin('ghostified.');*/
 		};
 	ghostify();
 });
