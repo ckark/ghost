@@ -197,106 +197,18 @@ figma.on('run', ({ parameters }) => {
     }),
         frames.map((e) => (e.layoutMode = 'NONE'));
     let shapes = all.filter((n) => n.type === 'ELLIPSE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'STAR'), vectors = all.filter((n) => n.type === 'VECTOR'), text = all.filter((n) => n.type === 'TEXT');
-    const nodes = [], ghostifyNonImages = (e) => {
+    const nodes = [], ghostifyFrames = (e) => {
         e.map((e) => {
-            (e.effects = [
-                {
-                    type: 'DROP_SHADOW' || 'INNER_SHADOW' || 'LAYER_BLUR',
-                    color: {
-                        r: 0,
-                        g: 0,
-                        b: 0,
-                        a: 0,
-                    },
-                    offset: {
-                        x: 0,
-                        y: 0,
-                    },
-                    radius: 0,
-                    spread: 0,
-                    visible: !0,
-                    blendMode: 'NORMAL',
-                    showShadowBehindNode: !0,
-                },
-            ]),
-                (e.fills = [
-                    {
-                        type: 'SOLID',
-                        opacity: 0,
-                        color: {
-                            r: 0,
-                            g: 0,
-                            b: 0,
-                        },
-                    },
-                ]),
-                (e.strokeWeight = 0),
-                (e.strokes = [
-                    {
-                        type: 'SOLID' || 'GRADIENT_LINEAR' || 'GRADIENT_RADIAL',
-                        opacity: 0,
-                        color: {
-                            r: 0,
-                            g: 0,
-                            b: 0,
-                        },
-                    },
-                ]);
-        });
-    }, ghostifyImages = (e) => {
-        e.map((e) => {
-            (e.effects = [
-                {
-                    type: 'DROP_SHADOW' || 'INNER_SHADOW' || 'LAYER_BLUR',
-                    color: {
-                        r: 0,
-                        g: 0,
-                        b: 0,
-                        a: 0,
-                    },
-                    offset: {
-                        x: 0,
-                        y: 0,
-                    },
-                    radius: 0,
-                    spread: 0,
-                    visible: !0,
-                    blendMode: 'NORMAL',
-                    showShadowBehindNode: !0,
-                },
-            ]),
-                (e.fills = fills),
-                e.strokeWeight > 0 && (e.strokes = fills),
-                0 === e.strokeWeight &&
-                    (e.strokes = [
-                        {
-                            type: 'SOLID' || 'GRADIENT_LINEAR' || 'GRADIENT_RADIAL',
-                            opacity: 0,
-                            color: {
-                                r: 0,
-                                g: 0,
-                                b: 0,
-                            },
-                        },
-                    ]),
+            '' !== e.effectStyleId && (e.effects = []),
+                '' !== (e.fillStyleId || e.backGroundStyleId) && (e.fills = []),
+                '' !== e.strokeStyleId && (e.strokes = []),
                 nodes.push(e);
         });
     }, ghostifyVector = (e) => {
         e.map((e) => {
             (e.fills = fills),
                 e.strokeWeight > 0 && (e.strokes = fills),
-                0 === e.strokeWeight &&
-                    (e.strokes = [
-                        {
-                            type: 'SOLID',
-                            opacity: 0,
-                            color: {
-                                r: 0,
-                                g: 0,
-                                b: 0,
-                            },
-                        },
-                    ]),
+                0 === e.strokeWeight && (e.strokes = []),
                 nodes.push(e);
         });
     }, ghostifyShapes = (e) => {
@@ -309,18 +221,7 @@ figma.on('run', ({ parameters }) => {
                 (s.y = e.relativeTransform[1][2]),
                 (s.fills = fills),
                 e.strokeWeight > 0 && (s.strokes = fills),
-                0 === e.strokeWeight &&
-                    (s.strokes = [
-                        {
-                            type: 'SOLID',
-                            opacity: 0,
-                            color: {
-                                r: 0,
-                                g: 0,
-                                b: 0,
-                            },
-                        },
-                    ]),
+                0 === e.strokeWeight && (s.strokes = []),
                 nodes.push(s),
                 'COMPONENT_SET' !== e.parent.type &&
                     'PAGE' !== e.parent.type &&
@@ -363,14 +264,12 @@ figma.on('run', ({ parameters }) => {
         }),
             setTimeout(() => t('done'), 0);
     }), ghostify = async () => {
-        ghostifyNonImages(nonimages),
-            ghostifyNonImages(topframes),
-            ghostifyImages(images),
+        ghostifyFrames(nonimages),
+            ghostifyFrames(images),
             await ghostifyText(text),
             ghostifyVector(vectors),
             ghostifyShapes(shapes),
-            console.clear(),
-            figma.closePlugin('ghostified.');
+            figma.closePlugin('Ghostified.');
     };
     ghostify();
 });
