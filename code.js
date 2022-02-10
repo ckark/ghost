@@ -368,9 +368,9 @@ figma.on('run', ({ parameters }) => {
             ghostifyImages(images),
             await ghostifyText(text),
             ghostifyVector(vectors),
-            ghostifyShapes(shapes);
-        /*console.clear(),
-            figma.closePlugin('ghostified.');*/
+            ghostifyShapes(shapes),
+            console.clear(),
+            figma.closePlugin('ghostified.');
     };
     ghostify();
 });

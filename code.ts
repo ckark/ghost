@@ -392,9 +392,9 @@ figma.on('run', ({ parameters }: RunEvent) => {
 				ghostifyImages(images),
 				await ghostifyText(text),
 				ghostifyVector(vectors),
-				ghostifyShapes(shapes);
-			/*console.clear(),
-				figma.closePlugin('ghostified.');*/
+				ghostifyShapes(shapes),
+				console.clear(),
+				figma.closePlugin('ghostified.');
 		};
 	ghostify();
 });
