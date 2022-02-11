@@ -189,43 +189,19 @@ figma.on('run', ({ parameters }) => {
             .flat()
             .filter((e) => 'INSTANCE' !== e.type)
             .filter((e) => 'I' !== e.id.substr(0, 1)));
-    let topframes = all.filter((e) => 'FRAME' === e.type && 'PAGE' === e.parent.type), frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type), images = new Array(), nonimages = new Array();
-    frames.map((e) => {
-        e.fills.map((t) => {
-            t.type, 'IMAGE' === t.type ? images.push(e) : nonimages.push(e);
-        });
-    }),
-        frames.map((e) => (e.layoutMode = 'NONE'));
-    let shapes = all.filter((n) => n.type === 'ELLIPSE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'STAR'), vectors = all.filter((n) => n.type === 'VECTOR'), text = all.filter((n) => n.type === 'TEXT');
-    const nodes = [], ghostifyFrames = (e) => {
+    let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type), shapes = all.filter((n) => n.type === 'ELLIPSE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'STAR'), vectors = all.filter((n) => n.type === 'VECTOR'), text = all.filter((n) => n.type === 'TEXT');
+    const ghostifyFrames = (e) => {
         e.map((e) => {
-            '' !== e.effectStyleId && (e.effects = []),
-                '' !== (e.fillStyleId || e.backGroundStyleId) && (e.fills = []),
-                '' !== e.strokeStyleId && (e.strokes = []),
-                nodes.push(e);
+            (e.layoutMode = 'NONE'), (e.effects = []), (e.fills = []), (e.strokes = []);
         });
     }, ghostifyVector = (e) => {
         e.map((e) => {
-            (e.fills = fills),
-                e.strokeWeight > 0 && (e.strokes = fills),
-                0 === e.strokeWeight && (e.strokes = []),
-                nodes.push(e);
+            (e.fills = fills), e.strokeWeight > 0 && (e.strokes = fills), 0 === e.strokeWeight && (e.strokes = []);
         });
     }, ghostifyShapes = (e) => {
         e.map((e) => {
-            const s = figma.createRectangle();
-            0 !== e.cornerRadius && (s.cornerRadius = e.width),
-                'ELLIPSE' === e.type && (s.cornerRadius = e.width),
-                s.resizeWithoutConstraints(e.width, e.height),
-                (s.x = e.relativeTransform[0][2]),
-                (s.y = e.relativeTransform[1][2]),
-                (s.fills = fills),
-                e.strokeWeight > 0 && (s.strokes = fills),
-                0 === e.strokeWeight && (s.strokes = []),
-                nodes.push(s),
-                'COMPONENT_SET' !== e.parent.type &&
-                    'PAGE' !== e.parent.type &&
-                    (e.parent.insertChild(e.parent.children.length, s), e.remove());
+            e.strokes = [];
+            e.fills.filter((e) => 'IMAGE' === e.type) ? (e.fills = []) : (e.fills = fills);
         });
     }, ghostifyText = (e) => new Promise((t) => {
         e.map(async (e) => {
@@ -237,7 +213,6 @@ figma.on('run', ({ parameters }) => {
                     (t.x = e.relativeTransform[0][2]),
                     (t.y = e.relativeTransform[1][2]),
                     (t.fills = fills),
-                    nodes.push(t),
                     e.parent.insertChild(e.parent.children.length, t),
                     e.remove();
             }
@@ -256,7 +231,6 @@ figma.on('run', ({ parameters }) => {
                         (i.x = e.relativeTransform[0][2]),
                         (i.y = e.relativeTransform[1][2] + n * t),
                         (i.fills = fills),
-                        nodes.push(i),
                         e.parent.insertChild(e.parent.children.length, i);
                 }
                 e.remove();
@@ -264,11 +238,10 @@ figma.on('run', ({ parameters }) => {
         }),
             setTimeout(() => t('done'), 0);
     }), ghostify = async () => {
-        ghostifyFrames(nonimages),
-            ghostifyFrames(images),
-            await ghostifyText(text),
+        ghostifyFrames(frames),
             ghostifyVector(vectors),
             ghostifyShapes(shapes),
+            await ghostifyText(text),
             figma.closePlugin('Ghostified.');
     };
     ghostify();
