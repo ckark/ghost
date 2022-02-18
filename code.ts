@@ -241,14 +241,14 @@ figma.on('run', ({ parameters }: RunEvent) => {
 							e.remove();
 					} else {
 						await figma.loadFontAsync(e.fontName as FontName);
-						(e.textAutoResize = 'NONE'),
-							!0 === e.hasMissingFont &&
-								figma.closePlugin("You can't convert text until loading its source font.");
+						!0 === e.hasMissingFont &&
+							figma.closePlugin("You can't convert text until loading its source font.");
 						let t = Number(e.fontSize),
 							i = e.height,
-							n = e.lineHeight;
+							n = e.lineHeight,
+							r = Math.round(i / n);
 						isNaN(n) && (n = 1.25 * t);
-						let r = Math.round(i / n);
+						i > n ? (e.textAutoResize = 'NONE') : (e.textAutoResize = 'WIDTH_AND_HEIGHT');
 						for (let t = 0; t < r; t++) {
 							const i = figma.createRectangle();
 							i.resizeWithoutConstraints(e.width, (e.height, 0.7 * n)),
