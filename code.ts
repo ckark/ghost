@@ -200,7 +200,12 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			.filter((e) => 'I' !== e.id.substr(0, 1)));
 	let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type),
 		shapes = all.filter(
-			(n) => n.type === 'ELLIPSE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'STAR',
+			(n) =>
+				n.type === 'ELLIPSE' ||
+				n.type === 'LINE' ||
+				n.type === 'POLYGON' ||
+				n.type === 'RECTANGLE' ||
+				n.type === 'STAR',
 		) as SceneNode[],
 		vectors = all.filter((n) => n.type === 'VECTOR') as VectorNode[],
 		text = all.filter((n) => n.type === 'TEXT') as TextNode[];
@@ -216,8 +221,9 @@ figma.on('run', ({ parameters }: RunEvent) => {
 		},
 		ghostifyShapes = (e) => {
 			e.map((e) => {
-				e.strokes = [];
-				e.fills.filter((e) => 'IMAGE' === e.type) ? (e.fills = []) : (e.fills = fills);
+				e.fills.filter((e) => 'IMAGE' !== e.type)
+					? ((e.fills = fills), (e.strokes = fills))
+					: ((e.fills = []), (e.strokes = []));
 			});
 		},
 		ghostifyText = (e) =>
@@ -256,13 +262,13 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					}
 				}),
 					setTimeout(() => t('done'), 0);
-			}),
-		ghostify = async () => {
-			ghostifyFrames(frames),
-				ghostifyVector(vectors),
-				ghostifyShapes(shapes),
-				await ghostifyText(text),
-				figma.closePlugin('Ghostified.');
-		};
+			});
+	const ghostify = async () => {
+		ghostifyFrames(frames),
+			ghostifyVector(vectors),
+			ghostifyShapes(shapes),
+			await ghostifyText(text),
+			figma.closePlugin('ghostified');
+	};
 	ghostify();
 });
