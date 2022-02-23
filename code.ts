@@ -201,10 +201,12 @@ figma.on('run', ({ parameters }: RunEvent) => {
 	let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type),
 		shapes = all.filter(
 			(n) =>
+				n.type === 'BOOLEAN_OPERATION' ||
 				n.type === 'ELLIPSE' ||
 				n.type === 'LINE' ||
 				n.type === 'POLYGON' ||
 				n.type === 'RECTANGLE' ||
+				n.type === 'SLICE' ||
 				n.type === 'STAR',
 		) as SceneNode[],
 		vectors = all.filter((n) => n.type === 'VECTOR') as VectorNode[],
@@ -241,14 +243,15 @@ figma.on('run', ({ parameters }: RunEvent) => {
 							e.remove();
 					} else {
 						await figma.loadFontAsync(e.fontName as FontName);
-						!0 === e.hasMissingFont &&
-							figma.closePlugin("You can't convert text until loading its source font.");
+						(e.textAutoResize = 'NONE'),
+							!0 === e.hasMissingFont &&
+								figma.closePlugin("You can't convert text until loading its source font.");
 						let t = Number(e.fontSize),
 							i = e.height,
-							n = e.lineHeight,
-							r = Math.round(i / n);
+							n = e.lineHeight;
 						isNaN(n) && (n = 1.25 * t);
 						i > n ? (e.textAutoResize = 'NONE') : (e.textAutoResize = 'WIDTH_AND_HEIGHT');
+						let r = Math.round(i / n);
 						for (let t = 0; t < r; t++) {
 							const i = figma.createRectangle();
 							i.resizeWithoutConstraints(e.width, (e.height, 0.7 * n)),

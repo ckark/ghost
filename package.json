@@ -1,7 +1,7 @@
 {
-	"name": "ghostify",
+	"name": "ghost",
 	"version": "1.0.0",
-	"description": "Your Figma plugin",
+	"description": "Turn your designs into skeletons or placeholders in a jiffy.",
 	"main": "code.js",
 	"scripts": {
 		"build": "tsc -p tsconfig.json"
@@ -9,9 +9,9 @@
 	"author": "Chris Kark",
 	"license": "MIT",
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.39.1"
+		"@figma/plugin-typings": "*"
 	},
 	"dependencies": {
-		"prettier": "^2.5.0"
+		"prettier": "*"
 	}
 }
