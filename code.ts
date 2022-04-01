@@ -263,7 +263,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			ghostifyVector(vectors),
 			ghostifyShapes(shapes),
 			await ghostifyText(text),
-			figma.closePlugin('ghostified');
+			figma.closePlugin('Selection ghostified 👻.');
 	};
 	ghostify();
 });
