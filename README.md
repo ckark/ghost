@@ -19,9 +19,9 @@ Loading is a state specific design akin to `disabled` or `destructive`, `hover` 
 
 ## Roadmap
 
--   Color picker—depending on whether Figma’s new input parameters add support for HTML-like inputs like `input type=color`.
--   Linear gradients for a sheen effect.
--   Convert one or more directly selected instances.
+- Color picker—depending on whether Figma’s new input parameters add support for HTML-like inputs like `input type=color`.
+- Linear gradients for a sheen effect.
+- Convert one or more directly selected instances.
 
 ## End Notes
 
