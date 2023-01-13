@@ -9,7 +9,7 @@
 	"author": "Chris Kark",
 	"license": "MIT",
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.49.0"
+		"@figma/plugin-typings": "*"
 	},
 	"dependencies": {
 		"prettier": "*"

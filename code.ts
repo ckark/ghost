@@ -192,15 +192,8 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			.filter((e) => 'I' !== e.id.substr(0, 1)));
 	let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type),
 		shapes = all.filter(
-			(n) =>
-				n.type === 'BOOLEAN_OPERATION' ||
-				n.type === 'ELLIPSE' ||
-				n.type === 'LINE' ||
-				n.type === 'POLYGON' ||
-				n.type === 'RECTANGLE' ||
-				n.type === 'SLICE' ||
-				n.type === 'STAR',
-		) as SceneNode[],
+			(n) => n.type === 'BOOLEAN_OPERATION' || n.type === 'ELLIPSE' || n.type === 'LINE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'SLICE' || n.type === 'STAR',
+		),
 		vectors = all.filter((n) => n.type === 'VECTOR') as VectorNode[],
 		text = all.filter((n) => n.type === 'TEXT') as TextNode[];
 	const ghostifyFrames = (e) => {
@@ -209,15 +202,13 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			});
 		},
 		ghostifyVector = (e) => {
-			e.map((e) => {
-				(e.fills = fills), e.strokeWeight > 0 && (e.strokes = fills), 0 === e.strokeWeight && (e.strokes = []);
+			e.map((s) => {
+				(s.fills = fills), s.strokeWeight > 0 && (s.strokes = fills), 0 === s.strokeWeight && (s.strokes = []);
 			});
 		},
 		ghostifyShapes = (e) => {
-			e.map((e) => {
-				e.fills.filter((e) => 'IMAGE' !== e.type)
-					? ((e.fills = fills), (e.strokes = fills))
-					: ((e.fills = []), (e.strokes = []));
+			e.map((l) => {
+				(l.effects = []), 'IMAGE' === l.fills.type ? ((l.fills = []), (l.strokes = [])) : ((l.fills = fills), (l.strokes = fills));
 			});
 		},
 		ghostifyText = (e) =>
@@ -235,14 +226,11 @@ figma.on('run', ({ parameters }: RunEvent) => {
 							e.remove();
 					} else {
 						await figma.loadFontAsync(e.fontName as FontName);
-						(e.textAutoResize = 'NONE'),
-							!0 === e.hasMissingFont &&
-								figma.closePlugin("You can't convert text until loading its source font.");
+						(e.textAutoResize = 'NONE'), !0 === e.hasMissingFont && figma.closePlugin("You can't convert text until loading its source font.");
 						let t = Number(e.fontSize),
 							i = e.height,
 							n = e.lineHeight;
-						isNaN(n) && (n = 1.25 * t);
-						i > n ? (e.textAutoResize = 'NONE') : (e.textAutoResize = 'WIDTH_AND_HEIGHT');
+						isNaN(n) && (n = 1.25 * t), (e.textAutoResize = i > n ? 'NONE' : 'WIDTH_AND_HEIGHT');
 						let r = Math.round(i / n);
 						for (let t = 0; t < r; t++) {
 							const i = figma.createRectangle();
@@ -259,11 +247,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					setTimeout(() => t('done'), 0);
 			});
 	const ghostify = async () => {
-		ghostifyFrames(frames),
-			ghostifyVector(vectors),
-			ghostifyShapes(shapes),
-			await ghostifyText(text),
-			figma.closePlugin('Selection ghostified 👻.');
+		ghostifyFrames(frames), ghostifyVector(vectors), ghostifyShapes(shapes), await ghostifyText(text), figma.closePlugin('Selection ghostified 👻.');
 	};
 	ghostify();
 });
