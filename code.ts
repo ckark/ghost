@@ -190,10 +190,8 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			.flat()
 			.filter((e) => 'INSTANCE' !== e.type)
 			.filter((e) => 'I' !== e.id.substr(0, 1)));
-	let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type),
-		shapes = all.filter(
-			(n) => n.type === 'BOOLEAN_OPERATION' || n.type === 'ELLIPSE' || n.type === 'LINE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'SLICE' || n.type === 'STAR',
-		),
+	let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type) as FrameNode[],
+		shapes = all.filter((n) => 'BOOLEAN_OPERATION' === n.type || n.type === 'ELLIPSE' || n.type === 'LINE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'STAR'),
 		vectors = all.filter((n) => n.type === 'VECTOR') as VectorNode[],
 		text = all.filter((n) => n.type === 'TEXT') as TextNode[];
 	const ghostifyFrames = (e) => {
@@ -207,9 +205,10 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			});
 		},
 		ghostifyShapes = (e) => {
-			e.map((l) => {
-				(l.effects = []), 'IMAGE' === l.fills.type ? ((l.fills = []), (l.strokes = [])) : ((l.fills = fills), (l.strokes = fills));
-			});
+			'BOOLEAN_OPERATION' === e.type && e.outlineStroke(),
+				e.map((e) => {
+					(e.effects = []), 'IMAGE' === e.fills.type ? ((e.fills = []), (e.strokes = [])) : ((e.fills = fills), (e.strokes = fills));
+				});
 		},
 		ghostifyText = (e) =>
 			new Promise((t) => {
@@ -247,7 +246,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					setTimeout(() => t('done'), 0);
 			});
 	const ghostify = async () => {
-		ghostifyFrames(frames), ghostifyVector(vectors), ghostifyShapes(shapes), await ghostifyText(text), figma.closePlugin('Selection ghostified 👻.');
+		await ghostifyText(text), ghostifyFrames(frames), ghostifyVector(vectors), ghostifyShapes(shapes), console.clear(), figma.closePlugin('Selection ghostified 👻.');
 	};
 	ghostify();
 });
