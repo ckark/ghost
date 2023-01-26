@@ -144,22 +144,19 @@ figma.on('run', ({ parameters }) => {
                 },
             ]);
     let all = new Array();
-    const traversal = (e, l) => {
-        const t = (function* e(t) {
-            const a = t.length;
-            if (0 !== a) {
-                for (let l = 0; l < a; l++) {
-                    const a = t[l];
-                    yield a;
-                    let o = a.children;
-                    o && (yield* e(o));
+    const traversal = (t, e) => {
+        const l = (function* t(l) {
+            for (let i = 0; i < l.length; i++) {
+                const n = l[i];
+                yield n;
+                if (n.children) {
+                    yield* t(n.children);
                 }
-                l.push(t);
             }
-        })(e);
-        let a = t.next();
-        for (; !a.done;)
-            a = t.next();
+            e.push(l);
+        })(t);
+        for (let i = l.next(); !i.done; i = l.next())
+            ;
     };
     traversal(figma.currentPage.selection, all), (all = all.flat());
     const detach = (e) => {
