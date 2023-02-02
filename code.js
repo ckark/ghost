@@ -1,163 +1,249 @@
-let e,
-	t = ['Solid', 'Linear Gradient'],
-	r = ['Gray', 'Black', 'White'];
-figma.parameters.on('input', ({ key: e, query: i, result: o }) => {
-	switch (e) {
+let type = ['Solid', 'Linear Gradient'],
+	colors = ['Gray', 'Black', 'White'],
+	fills;
+figma.parameters.on('input', ({ key, query, result }) => {
+	switch (key) {
 		case 'type':
-			o.setSuggestions(t.filter((e) => e.includes(i)));
+			result.setSuggestions(type.filter((s) => s.includes(query)));
 			break;
 		case 'color':
-			o.setSuggestions(r.filter((e) => e.includes(i)));
+			result.setSuggestions(colors.filter((s) => s.includes(query)));
 			break;
 		default:
 			return;
 	}
-}),
-	figma.on('run', ({ parameters: t }) => {
-		0 === figma.currentPage.selection.length && (figma.notify('Select at least one item.'), figma.closePlugin()),
-			t && 'Gray' === t.color && 'Solid' === t.type && (e = [{ type: 'SOLID', color: { r: 0.9, g: 0.9, b: 0.9 } }]),
-			'Gray' === t.color &&
-				'Linear Gradient' === t.type &&
-				(e = [
-					{
-						type: 'GRADIENT_LINEAR',
-						gradientTransform: [
-							[-1, 1.516437286852579e-8, 1],
-							[-1.7966517162903983e-8, -0.0659240335226059, 0.5335403084754944],
-						],
-						gradientStops: [
-							{ color: { r: 0.8588235378265381, g: 0.8588235378265381, b: 0.8588235378265381, a: 0.05 }, position: 0 },
-							{ color: { r: 0.8588235378265381, g: 0.8588235378265381, b: 0.8588235378265381, a: 1 }, position: 0.5 },
-						],
+});
+figma.on('run', ({ parameters }) => {
+	0 === figma.currentPage.selection.length && (figma.notify('Select at least one item.'), figma.closePlugin());
+	parameters &&
+		'Gray' === parameters.color &&
+		'Solid' === parameters.type &&
+		(fills = [
+			{
+				type: 'SOLID',
+				color: {
+					r: 0.9,
+					g: 0.9,
+					b: 0.9,
+				},
+			},
+		]),
+		'Gray' === parameters.color &&
+			'Linear Gradient' === parameters.type &&
+			(fills = [
+				{
+					type: 'GRADIENT_LINEAR',
+					gradientTransform: [
+						[-1, 1.516437286852579e-8, 1],
+						[-1.7966517162903983e-8, -0.0659240335226059, 0.5335403084754944],
+					],
+					gradientStops: [
+						{
+							color: {
+								r: 0.8588235378265381,
+								g: 0.8588235378265381,
+								b: 0.8588235378265381,
+								a: 0.05,
+							},
+							position: 0,
+						},
+						{
+							color: {
+								r: 0.8588235378265381,
+								g: 0.8588235378265381,
+								b: 0.8588235378265381,
+								a: 1,
+							},
+							position: 0.5,
+						},
+					],
+				},
+			]),
+		'Black' === parameters.color &&
+			'Solid' === parameters.type &&
+			(fills = [
+				{
+					type: 'SOLID',
+					color: {
+						r: 0,
+						g: 0,
+						b: 0,
 					},
-				]),
-			'Black' === t.color && 'Solid' === t.type && (e = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }]),
-			'Black' === t.color &&
-				'Linear Gradient' === t.type &&
-				(e = [
-					{
-						type: 'GRADIENT_LINEAR',
-						gradientTransform: [
-							[-1, 1.516437286852579e-8, 1],
-							[-1.7966517162903983e-8, -0.0659240335226059, 0.5335403084754944],
-						],
-						gradientStops: [
-							{ color: { r: 0, g: 0, b: 0, a: 1 }, position: 0 },
-							{ color: { r: 0, g: 0, b: 0, a: 0.05 }, position: 0.5 },
-						],
+				},
+			]),
+		'Black' === parameters.color &&
+			'Linear Gradient' === parameters.type &&
+			(fills = [
+				{
+					type: 'GRADIENT_LINEAR',
+					gradientTransform: [
+						[-1, 1.516437286852579e-8, 1],
+						[-1.7966517162903983e-8, -0.0659240335226059, 0.5335403084754944],
+					],
+					gradientStops: [
+						{
+							color: {
+								r: 0,
+								g: 0,
+								b: 0,
+								a: 1,
+							},
+							position: 0,
+						},
+						{
+							color: {
+								r: 0,
+								g: 0,
+								b: 0,
+								a: 0.05,
+							},
+							position: 0.5,
+						},
+					],
+				},
+			]),
+		'White' === parameters.color &&
+			'Solid' === parameters.type &&
+			(fills = [
+				{
+					type: 'SOLID',
+					color: {
+						r: 1,
+						g: 1,
+						b: 1,
 					},
-				]),
-			'White' === t.color && 'Solid' === t.type && (e = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }]),
-			'White' === t.color &&
-				'Linear Gradient' === t.type &&
-				(e = [
-					{
-						type: 'GRADIENT_LINEAR',
-						gradientTransform: [
-							[-1, 1.516437286852579e-8, 1],
-							[-1.7966517162903983e-8, -0.0659240335226059, 0.5335403084754944],
-						],
-						gradientStops: [
-							{ color: { r: 1, g: 1, b: 1, a: 1 }, position: 0 },
-							{ color: { r: 1, g: 1, b: 1, a: 0.05 }, position: 0.5 },
-						],
-					},
-				]);
-		let r = new Array();
-		const i = (e, t) => {
-			const r = (function* e(r) {
-				for (let t = 0; t < r.length; t++) {
-					const i = r[t];
-					yield i, i.children && (yield* e(i.children));
+				},
+			]),
+		'White' === parameters.color &&
+			'Linear Gradient' === parameters.type &&
+			(fills = [
+				{
+					type: 'GRADIENT_LINEAR',
+					gradientTransform: [
+						[-1, 1.516437286852579e-8, 1],
+						[-1.7966517162903983e-8, -0.0659240335226059, 0.5335403084754944],
+					],
+					gradientStops: [
+						{
+							color: {
+								r: 1,
+								g: 1,
+								b: 1,
+								a: 1,
+							},
+							position: 0,
+						},
+						{
+							color: {
+								r: 1,
+								g: 1,
+								b: 1,
+								a: 0.05,
+							},
+							position: 0.5,
+						},
+					],
+				},
+			]);
+	let all = new Array();
+	const traversal = (t, e) => {
+		const l = (function* t(l) {
+			for (let i = 0; i < l.length; i++) {
+				const n = l[i];
+				yield n;
+				if (n.children) {
+					yield* t(n.children);
 				}
-				t.push(r);
-			})(e);
-			for (let e = r.next(); !e.done; e = r.next());
-		};
-		i(figma.currentPage.selection, r), (r = r.flat());
-		const o = (e) => {
-			let t = new Array();
-			if ((e = e.filter((e) => 'INSTANCE' === e.type).filter((e) => 'I' !== e.id.substr(0, 1))).length > 0)
-				return (
-					i(
-						e.map((e) => e.detachInstance()),
-						t,
-					),
-					r.push(
-						t
-							.flat()
-							.filter((e) => 'INSTANCE' !== e.type)
-							.filter((e) => 'I' !== e.id.substr(0, 1)),
-					),
-					(t = t
+			}
+			e.push(l);
+		})(t);
+		for (let i = l.next(); !i.done; i = l.next());
+	};
+	traversal(figma.currentPage.selection, all), (all = all.flat());
+	const detach = (e) => {
+		let t = new Array();
+		if ((e = e.filter((e) => 'INSTANCE' === e.type).filter((e) => 'I' !== e.id.substr(0, 1))).length > 0)
+			return (
+				traversal(
+					e.map((e) => e.detachInstance()),
+					t,
+				),
+				all.push(
+					t
 						.flat()
-						.filter((e) => 'INSTANCE' === e.type)
-						.filter((e) => 'I' !== e.id.substr(0, 1))),
-					o(t),
-					r.flat()
-				);
-		};
-		o(r);
-		let l = (r = r
-				.flat()
-				.filter((e) => 'INSTANCE' !== e.type)
-				.filter((e) => 'I' !== e.id.substr(0, 1))).filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type),
-			a = r.filter((e) => 'BOOLEAN_OPERATION' === e.type || 'ELLIPSE' === e.type || 'LINE' === e.type || 'POLYGON' === e.type || 'RECTANGLE' === e.type || 'STAR' === e.type),
-			n = r.filter((e) => 'VECTOR' === e.type),
-			s = r.filter((e) => 'TEXT' === e.type);
-		(async () => {
-			var t;
-			await ((t = s),
-			new Promise((r) => {
-				t.map(async (t) => {
-					if (t.fontName === figma.mixed) {
-						const r = figma.createRectangle();
-						let i = t.height;
-						r.resizeWithoutConstraints(t.width, 0.7 * t.height),
-							(r.cornerRadius = i),
-							(r.x = t.relativeTransform[0][2]),
-							(r.y = t.relativeTransform[1][2]),
-							(r.fills = e),
-							t.parent.insertChild(t.parent.children.length, r),
-							t.remove();
+						.filter((e) => 'INSTANCE' !== e.type)
+						.filter((e) => 'I' !== e.id.substr(0, 1)),
+				),
+				(t = t
+					.flat()
+					.filter((e) => 'INSTANCE' === e.type)
+					.filter((e) => 'I' !== e.id.substr(0, 1))),
+				detach(t),
+				all.flat()
+			);
+	};
+	detach(all),
+		(all = all
+			.flat()
+			.filter((e) => 'INSTANCE' !== e.type)
+			.filter((e) => 'I' !== e.id.substr(0, 1)));
+	let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type),
+		shapes = all.filter((n) => 'BOOLEAN_OPERATION' === n.type || n.type === 'ELLIPSE' || n.type === 'LINE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'STAR'),
+		vectors = all.filter((n) => n.type === 'VECTOR'),
+		text = all.filter((n) => n.type === 'TEXT');
+	const ghostifyFrames = (e) => {
+			e.map((e) => {
+				(e.layoutMode = 'NONE'), (e.effects = []), (e.fills = []), (e.strokes = []);
+			});
+		},
+		ghostifyVector = (e) => {
+			e.map((s) => {
+				(s.fills = fills), s.strokeWeight > 0 && (s.strokes = fills), 0 === s.strokeWeight && (s.strokes = []);
+			});
+		},
+		ghostifyShapes = (e) => {
+			'BOOLEAN_OPERATION' === e.type && e.outlineStroke(),
+				e.map((e) => {
+					(e.effects = []), 'IMAGE' === e.fills.type ? ((e.fills = []), (e.strokes = [])) : ((e.fills = fills), (e.strokes = fills));
+				});
+		},
+		ghostifyText = (e) =>
+			new Promise((t) => {
+				e.map(async (e) => {
+					if (e.fontName === figma.mixed) {
+						const t = figma.createRectangle();
+						let i = e.height;
+						t.resizeWithoutConstraints(e.width, 0.7 * e.height),
+							(t.cornerRadius = i),
+							(t.x = e.relativeTransform[0][2]),
+							(t.y = e.relativeTransform[1][2]),
+							(t.fills = fills),
+							e.parent.insertChild(e.parent.children.length, t),
+							e.remove();
 					} else {
-						await figma.loadFontAsync(t.fontName), (t.textAutoResize = 'NONE'), !0 === t.hasMissingFont && figma.closePlugin("You can't convert text until loading its source font.");
-						let r = Number(t.fontSize),
-							i = t.height,
-							o = t.lineHeight;
-						isNaN(o) && (o = 1.25 * r), (t.textAutoResize = i > o ? 'NONE' : 'WIDTH_AND_HEIGHT');
-						let l = Math.round(i / o);
-						for (let r = 0; r < l; r++) {
+						await figma.loadFontAsync(e.fontName);
+						(e.textAutoResize = 'NONE'), !0 === e.hasMissingFont && figma.closePlugin("You can't convert text until loading its source font.");
+						let t = Number(e.fontSize),
+							i = e.height,
+							n = e.lineHeight;
+						isNaN(n) && (n = 1.25 * t), (e.textAutoResize = i > n ? 'NONE' : 'WIDTH_AND_HEIGHT');
+						let r = Math.round(i / n);
+						for (let t = 0; t < r; t++) {
 							const i = figma.createRectangle();
-							i.resizeWithoutConstraints(t.width, (t.height, 0.7 * o)),
-								(i.cornerRadius = o),
-								(i.x = t.relativeTransform[0][2]),
-								(i.y = t.relativeTransform[1][2] + o * r),
-								(i.fills = e),
-								t.parent.insertChild(t.parent.children.length, i);
+							i.resizeWithoutConstraints(e.width, (e.height, 0.7 * n)),
+								(i.cornerRadius = n),
+								(i.x = e.relativeTransform[0][2]),
+								(i.y = e.relativeTransform[1][2] + n * t),
+								(i.fills = fills),
+								e.parent.insertChild(e.parent.children.length, i);
 						}
-						t.remove();
+						e.remove();
 					}
 				}),
-					setTimeout(() => r('done'), 0);
-			})),
-				((e) => {
-					l.map((e) => {
-						(e.layoutMode = 'NONE'), (e.effects = []), (e.fills = []), (e.strokes = []);
-					});
-				})(),
-				((t) => {
-					n.map((t) => {
-						(t.fills = e), t.strokeWeight > 0 && (t.strokes = e), 0 === t.strokeWeight && (t.strokes = []);
-					});
-				})(),
-				((t) => {
-					'BOOLEAN_OPERATION' === t.type && t.outlineStroke(),
-						t.map((t) => {
-							(t.effects = []), 'IMAGE' === t.fills.type ? ((t.fills = []), (t.strokes = [])) : ((t.fills = e), (t.strokes = e));
-						});
-				})(a),
-				console.clear(),
-				figma.closePlugin('Selection ghostified 👻.');
-		})();
-	});
+					setTimeout(() => t('done'), 0);
+			});
+	const ghostify = async () => {
+		await ghostifyText(text), ghostifyFrames(frames), ghostifyVector(vectors), ghostifyShapes(shapes), console.clear(), figma.closePlugin('Selection ghostified 👻.');
+	};
+	ghostify();
+});
