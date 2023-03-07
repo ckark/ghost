@@ -210,40 +210,45 @@ figma.on('run', ({ parameters }: RunEvent) => {
 		ghostifyText = (e) =>
 			new Promise((t) => {
 				e.map(async (e) => {
+					await figma.loadFontAsync(e.fontName as FontName);
+					const getRandomArbitrary = (e, t) => Math.floor(Math.random() * (t - e) + e);
 					if (e.fontName === figma.mixed) {
 						const t = figma.createRectangle();
-						let i = e.height;
 						t.resizeWithoutConstraints(e.width, 0.7 * e.height),
-							(t.cornerRadius = i),
+							(t.cornerRadius = e.height),
 							(t.x = e.relativeTransform[0][2]),
 							(t.y = e.relativeTransform[1][2]),
 							(t.fills = fills),
 							e.parent.insertChild(e.parent.children.length, t),
 							e.remove();
 					} else {
-						await figma.loadFontAsync(e.fontName as FontName);
 						(e.textAutoResize = 'NONE'), !0 === e.hasMissingFont && figma.closePlugin("You can't convert text until loading its source font.");
 						let t = Number(e.fontSize),
 							i = e.height,
-							n = e.lineHeight;
-						isNaN(n) && (n = 1.25 * t), (e.textAutoResize = i > n ? 'NONE' : 'WIDTH_AND_HEIGHT');
-						let r = Math.round(i / n);
-						for (let t = 0; t < r; t++) {
+							r = e.lineHeight;
+						isNaN(r) && (r = 1.25 * t), (e.textAutoResize = i > r ? 'NONE' : 'WIDTH_AND_HEIGHT'), console.log(r);
+						let n = Math.round(i / r);
+						for (let t = 0; t < n; t++) {
 							const i = figma.createRectangle();
-							i.resizeWithoutConstraints(e.width, (e.height, 0.7 * n)),
-								(i.cornerRadius = n),
+							e.height > r ? i.resizeWithoutConstraints(getRandomArbitrary(e.width / 2, e.width), (e.height, 0.7 * r)) : i.resizeWithoutConstraints(e.width, (e.height, 0.7 * r)),
+								(i.cornerRadius = r),
 								(i.x = e.relativeTransform[0][2]),
-								(i.y = e.relativeTransform[1][2] + n * t),
+								(i.y = e.relativeTransform[1][2] + r * t),
 								(i.fills = fills),
 								e.parent.insertChild(e.parent.children.length, i);
 						}
-						e.remove();
 					}
+					e.remove();
 				}),
 					setTimeout(() => t('done'), 0);
 			});
-	const ghostify = async () => {
-		await ghostifyText(text), ghostifyFrames(frames), ghostifyVector(vectors), ghostifyShapes(shapes), console.clear(), figma.closePlugin('Selection ghostified 👻.');
-	};
-	ghostify();
+	Promise.all([ghostifyText(text), ghostifyFrames(frames), ghostifyVector(vectors), ghostifyShapes(shapes)])
+		.then(() => {
+			console.clear();
+			figma.closePlugin(`Selection ghostified 👻.`);
+		})
+		.catch((error) => {
+			console.error(error);
+			figma.closePlugin(`Error occurred: ${error.message}`);
+		});
 });
