@@ -198,7 +198,14 @@ figma.on('run', ({ parameters }: RunEvent) => {
 		},
 		ghostifyVector = (e) => {
 			e.map((s) => {
-				(s.fills = fills), s.strokeWeight > 0 && (s.strokes = fills), 0 === s.strokeWeight && (s.strokes = []);
+				const t = figma.createRectangle();
+				t.resizeWithoutConstraints(s.width, s.height),
+					(t.cornerRadius = s.height),
+					(t.x = s.relativeTransform[0][2]),
+					(t.y = s.relativeTransform[1][2]),
+					(t.fills = fills),
+					s.parent.insertChild(s.parent.children.length, t),
+					s.remove();
 			});
 		},
 		ghostifyShapes = (e) => {
@@ -226,7 +233,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 						let t = Number(e.fontSize),
 							i = e.height,
 							r = e.lineHeight;
-						isNaN(r) && (r = 1.25 * t), (e.textAutoResize = i > r ? 'NONE' : 'WIDTH_AND_HEIGHT'), console.log(r);
+						isNaN(r) && (r = 1.25 * t), (e.textAutoResize = i > r ? 'NONE' : 'WIDTH_AND_HEIGHT');
 						let n = Math.round(i / r);
 						for (let t = 0; t < n; t++) {
 							const i = figma.createRectangle();
