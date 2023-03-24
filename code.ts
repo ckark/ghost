@@ -146,7 +146,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 				},
 			]);
 	let all = new Array();
-	const traversal = (t, e) => {
+	const traversal = (t: any, e: any) => {
 		const l = (function* t(l) {
 			for (let i = 0; i < l.length; i++) {
 				const n = l[i];
@@ -160,12 +160,12 @@ figma.on('run', ({ parameters }: RunEvent) => {
 		for (let i = l.next(); !i.done; i = l.next());
 	};
 	traversal(figma.currentPage.selection, all), (all = all.flat());
-	const detach = (e) => {
+	const detach = (e: any) => {
 		let t = new Array();
-		if ((e = e.filter((e) => 'INSTANCE' === e.type).filter((e) => 'I' !== e.id.substr(0, 1))).length > 0)
+		if ((e = e.filter((e: any) => 'INSTANCE' === e.type).filter((e: any) => 'I' !== e.id.substr(0, 1))).length > 0)
 			return (
 				traversal(
-					e.map((e) => e.detachInstance()),
+					e.map((e: any) => e.detachInstance()),
 					t,
 				),
 				all.push(
@@ -188,16 +188,24 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			.filter((e) => 'INSTANCE' !== e.type)
 			.filter((e) => 'I' !== e.id.substr(0, 1)));
 	let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type) as FrameNode[],
-		shapes = all.filter((n) => 'BOOLEAN_OPERATION' === n.type || n.type === 'ELLIPSE' || n.type === 'LINE' || n.type === 'POLYGON' || n.type === 'RECTANGLE' || n.type === 'STAR'),
+		shapes = all.filter(
+			(n) =>
+				'BOOLEAN_OPERATION' === n.type ||
+				n.type === 'ELLIPSE' ||
+				n.type === 'LINE' ||
+				n.type === 'POLYGON' ||
+				n.type === 'RECTANGLE' ||
+				n.type === 'STAR',
+		),
 		vectors = all.filter((n) => n.type === 'VECTOR') as VectorNode[],
 		text = all.filter((n) => n.type === 'TEXT') as TextNode[];
-	const ghostifyFrames = (e) => {
-			e.map((e) => {
+	const ghostifyFrames = (e: any) => {
+			e.map((e: any) => {
 				(e.layoutMode = 'NONE'), (e.effects = []), (e.fills = []), (e.strokes = []);
 			});
 		},
-		ghostifyVector = (e) => {
-			e.map((s) => {
+		ghostifyVector = (e: any) => {
+			e.map((s: any) => {
 				const t = figma.createRectangle();
 				t.resizeWithoutConstraints(s.width, s.height),
 					(t.cornerRadius = s.height),
@@ -208,54 +216,63 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					s.remove();
 			});
 		},
-		ghostifyShapes = (e) => {
+		ghostifyShapes = (e: any) => {
 			'BOOLEAN_OPERATION' === e.type && e.outlineStroke(),
-				e.map((e) => {
-					(e.effects = []), 'IMAGE' === e.fills.type ? ((e.fills = []), (e.strokes = [])) : ((e.fills = fills), (e.strokes = fills));
+				e.map((e: any) => {
+					(e.effects = []),
+						'IMAGE' === e.fills.type
+							? ((e.fills = []), (e.strokes = []))
+							: ((e.fills = fills), (e.strokes = fills));
 				});
 		},
-		ghostifyText = (e) =>
-			new Promise((t) => {
-				e.map(async (e) => {
-					await figma.loadFontAsync(e.fontName as FontName);
-					const getRandomArbitrary = (e, t) => Math.floor(Math.random() * (t - e) + e);
-					if (e.fontName === figma.mixed) {
-						const t = figma.createRectangle();
-						t.resizeWithoutConstraints(e.width, 0.7 * e.height),
-							(t.cornerRadius = e.height),
-							(t.x = e.relativeTransform[0][2]),
-							(t.y = e.relativeTransform[1][2]),
-							(t.fills = fills),
-							e.parent.insertChild(e.parent.children.length, t),
-							e.remove();
-					} else {
-						(e.textAutoResize = 'NONE'), !0 === e.hasMissingFont && figma.closePlugin("You can't convert text until loading its source font.");
-						let t = Number(e.fontSize),
-							i = e.height,
-							r = e.lineHeight;
-						isNaN(r) && (r = 1.25 * t), (e.textAutoResize = i > r ? 'NONE' : 'WIDTH_AND_HEIGHT');
-						let n = Math.round(i / r);
-						for (let t = 0; t < n; t++) {
-							const i = figma.createRectangle();
-							e.height > r ? i.resizeWithoutConstraints(getRandomArbitrary(e.width / 2, e.width), (e.height, 0.7 * r)) : i.resizeWithoutConstraints(e.width, (e.height, 0.7 * r)),
-								(i.cornerRadius = r),
-								(i.x = e.relativeTransform[0][2]),
-								(i.y = e.relativeTransform[1][2] + r * t),
-								(i.fills = fills),
-								e.parent.insertChild(e.parent.children.length, i);
-						}
-					}
-					e.remove();
-				}),
-					setTimeout(() => t('done'), 0);
+		ghostifyText = async (f) => {
+			const fontLoadingPromises = f.map((t) => {
+				const a = t.getRangeFontName(0, 1);
+				return figma.loadFontAsync({
+					family: a.family,
+					style: a.style,
+				});
 			});
-	Promise.all([ghostifyText(text), ghostifyFrames(frames), ghostifyVector(vectors), ghostifyShapes(shapes)])
-		.then(() => {
-			console.clear();
-			figma.closePlugin(`Selection ghostified 👻.`);
-		})
-		.catch((error) => {
-			console.error(error);
-			figma.closePlugin(`Error occurred: ${error.message}`);
-		});
+			await Promise.all(fontLoadingPromises);
+			f.forEach((e: any) => {
+				const w = e.getRangeFontName(0, 1);
+				'Symbol(figma.mixed)' === e.fontName.toString() && e.setRangeFontName(0, e.characters.length, w);
+				const getRandomArbitrary = (e, t) => Math.floor(Math.random() * (t - e) + e);
+				(e.textAutoResize = 'NONE'),
+					!0 === e.hasMissingFont &&
+						figma.closePlugin("You can't convert text until loading its source font.");
+				let t = Number(e.fontSize),
+					i = e.height,
+					r = e.lineHeight;
+				isNaN(r) && (r = 1.25 * t), (e.textAutoResize = i > r ? 'NONE' : 'WIDTH_AND_HEIGHT');
+				const n = Math.round(i / r);
+				for (let t = 0; t < n; t++) {
+					const i = figma.createRectangle();
+					e.height > r
+						? i.resizeWithoutConstraints(getRandomArbitrary(e.width / 2, e.width), (e.height, 0.7 * r))
+						: i.resizeWithoutConstraints(e.width, (e.height, 0.7 * r)),
+						(i.cornerRadius = r),
+						(i.x = e.relativeTransform[0][2]),
+						(i.y = e.relativeTransform[1][2] + r * t),
+						(i.fills = fills),
+						e.parent.insertChild(e.parent.children.length, i);
+				}
+				e.remove();
+			});
+		};
+
+	(async () => {
+		try {
+			await Promise.all([
+				ghostifyText(text),
+				ghostifyFrames(frames),
+				ghostifyVector(vectors),
+				ghostifyShapes(shapes),
+			]),
+				console.clear(),
+				figma.closePlugin('Selection ghostified 👻.');
+		} catch (e) {
+			console.error(e), figma.closePlugin(`Error occurred: ${e.message}`);
+		}
+	})();
 });
