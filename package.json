@@ -12,6 +12,6 @@
 		"@figma/plugin-typings": "*"
 	},
 	"dependencies": {
-		"prettier": "^2.8.7"
+		"prettier": "*"
 	}
 }
