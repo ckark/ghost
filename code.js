@@ -212,52 +212,55 @@ figma.on('run', ({ parameters }) => {
                     : ((e.fills = fills), (e.strokes = fills));
         l(t);
     }, h = async (t) => {
-        const e = t.map((t) => {
-            const e = t.getRangeFontName(0, 1);
-            return figma.loadFontAsync({ family: e.family, style: e.style });
-        });
-        await Promise.all(e);
+        const u = new Set(t.map((t) => t.getRangeFontName(0, 1)));
+        const f = Array.from(u).map((e) => figma.loadFontAsync({ family: e.family, style: e.style }));
+        await Promise.all(f);
         const n = [], o = [];
         for (const e of t) {
-            const t = e.characters, o = e.parent, s = e.getRangeTextStyleId(0, 1), r = e.getRangeFontName(0, 1);
-            s ? (e.textStyleId = s) : (e.fontName = r);
-            const i = t
+            const t = e.characters, o = e.parent, s = e.getRangeTextStyleId(0, 1), r = e.getRangeFontName(0, 1), i = t
                 .split(/\r?\n/)
                 .filter(Boolean)
                 .map((t) => t.trim());
+            s ? (e.textStyleId = s) : (e.fontName = r);
             let l = 0;
-            for (let t = 0; t < i.length; t++) {
+            const y = e.y;
+            const x = 'HEIGHT';
+            for (const character of i) {
                 const s = e.clone();
-                (s.characters = i[t]),
-                    (s.y = s.y + l),
-                    (s.textAutoResize = 'HEIGHT'),
-                    (l += s.height),
-                    o.appendChild(s),
-                    n.push(s);
+                s.characters = character;
+                s.y = y + l;
+                s.textAutoResize = x;
+                l += s.height;
+                o.appendChild(s);
+                n.push(s);
             }
             e.remove();
         }
         for (const t of n) {
             const e = t.getRangeFontName(0, 1);
-            'Symbol(figma.mixed)' === t.fontName.toString() && t.setRangeFontName(0, t.characters.length, e);
-            const n = (t, e) => Math.floor(Math.random() * (e - t) + t);
-            (t.textAutoResize = 'NONE'),
-                !0 === t.hasMissingFont &&
-                    figma.closePlugin("You can't convert text until loading its source font.");
-            let s = Number(t.fontSize), r = t.height, i = t.lineHeight;
-            isNaN(i) && (i = 1.25 * s), (t.textAutoResize = r > i ? 'NONE' : 'WIDTH_AND_HEIGHT');
-            const l = Math.round(r / i);
-            for (let e = 0; e < l; e++) {
-                const s = figma.createRectangle();
-                t.height > i
-                    ? s.resizeWithoutConstraints(n(t.width / 2, t.width), 0.7 * i)
-                    : s.resizeWithoutConstraints(t.width, 0.7 * i),
-                    (s.cornerRadius = i),
-                    (s.x = t.relativeTransform[0][2]),
-                    (s.y = t.relativeTransform[1][2] + i * e),
-                    (s.fills = fills),
-                    t.parent.insertChild(t.parent.children.length, s),
-                    o.push(s);
+            if ('Symbol(figma.mixed)' === t.fontName.toString()) {
+                t.setRangeFontName(0, t.characters.length, e);
+            }
+            t.textAutoResize = 'NONE';
+            if (t.hasMissingFont) {
+                figma.closePlugin('You can’t convert text until loading its source font.');
+            }
+            let n = Number(t.fontSize), i = t.height, a = t.lineHeight;
+            if (isNaN(a)) {
+                a = 1.2 * n;
+            }
+            t.textAutoResize = i > a ? 'NONE' : 'WIDTH_AND_HEIGHT';
+            const r = Math.round(i / a), s = t.parent.children.length;
+            for (let e = 0; e < r; e++) {
+                const n = figma.createRectangle();
+                n.resizeWithoutConstraints(t.width, 0.7 * a);
+                n.cornerRadius = a;
+                n.x = t.relativeTransform[0][2];
+                n.y = t.relativeTransform[1][2];
+                n.y += a * e;
+                n.fills = fills;
+                t.parent.insertChild(s, n);
+                o.push(n);
             }
             t.remove();
         }
@@ -265,10 +268,13 @@ figma.on('run', ({ parameters }) => {
     };
     (async () => {
         try {
-            await Promise.all([h(i), a(o), c(r), f(s)]), figma.closePlugin('Selection ghostified 👻.');
+            const e = (await Promise.allSettled([h(i), a(o), c(r), f(s)])).filter((r) => 'rejected' === r.status);
+            e.length
+                ? (console.error(e), figma.closePlugin('Error occurred'))
+                : figma.closePlugin('Selection ghostified 👻.');
         }
-        catch (t) {
-            console.error(t), figma.closePlugin('Error occurred');
+        catch (r) {
+            console.error(r), figma.closePlugin('Error occurred');
         }
     })();
 });
