@@ -14,7 +14,7 @@ figma.parameters.on('input', ({ key, query, result }: ParameterInputEvent) => {
 	}
 });
 figma.on('run', ({ parameters }: RunEvent) => {
-	0 === figma.currentPage.selection.length && (figma.notify('Select at least one item.'), figma.closePlugin());
+	0 === figma.currentPage.selection.length && (figma.notify(`Select at least one item.`), figma.closePlugin());
 	parameters &&
 		'Gray' === parameters.color &&
 		'Solid' === parameters.type &&
@@ -145,134 +145,142 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					],
 				},
 			]);
-	let all = new Array();
-	const traversal = (t: any, e: any) => {
-		const l = (function* t(l) {
-			for (let i = 0; i < l.length; i++) {
-				const n = l[i];
-				yield n;
-				if (n.children) {
-					yield* t(n.children);
-				}
+	let t = [];
+	const e = (t, e) => {
+		const n = (function* t(n) {
+			for (let e = 0; e < n.length; e++) {
+				const o = n[e];
+				yield o, o.children && (yield* t(o.children));
 			}
-			e.push(l);
+			e.push(n);
 		})(t);
-		for (let i = l.next(); !i.done; i = l.next());
+		for (let t = n.next(); !t.done; t = n.next());
 	};
-	traversal(figma.currentPage.selection, all), (all = all.flat());
-	const detach = (e: any) => {
-		let t = new Array();
-		if ((e = e.filter((e: any) => 'INSTANCE' === e.type).filter((e: any) => 'I' !== e.id.substr(0, 1))).length > 0)
-			return (
-				traversal(
-					e.map((e: any) => e.detachInstance()),
-					t,
-				),
-				all.push(
-					t
-						.flat()
-						.filter((e) => 'INSTANCE' !== e.type)
-						.filter((e) => 'I' !== e.id.substr(0, 1)),
-				),
-				(t = t
-					.flat()
-					.filter((e) => 'INSTANCE' === e.type)
-					.filter((e) => 'I' !== e.id.substr(0, 1))),
-				detach(t),
-				all.flat()
-			);
+	e(figma.currentPage.selection, t), (t = t.flat());
+	const n = (o) => {
+		let s = [];
+		const r = o.filter((t) => 'INSTANCE' === t.type && 'I' !== t.id.substr(0, 1));
+		if (0 === r.length) return t.flat();
+		const i = r.map((t) => t.detachInstance());
+		e(i, s), t.push(...s.flat().filter((t) => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1)));
+		const l = s.flat().filter((t) => 'INSTANCE' === t.type && 'I' !== t.id.substr(0, 1));
+		return n(l);
 	};
-	detach(all),
-		(all = all
-			.flat()
-			.filter((e) => 'INSTANCE' !== e.type)
-			.filter((e) => 'I' !== e.id.substr(0, 1)));
-	let frames = all.filter((e) => 'FRAME' === e.type && 'PAGE' !== e.parent.type) as FrameNode[],
-		shapes = all.filter(
-			(n) =>
-				'BOOLEAN_OPERATION' === n.type ||
-				n.type === 'ELLIPSE' ||
-				n.type === 'LINE' ||
-				n.type === 'POLYGON' ||
-				n.type === 'RECTANGLE' ||
-				n.type === 'STAR',
-		),
-		vectors = all.filter((n) => n.type === 'VECTOR') as VectorNode[],
-		text = all.filter((n) => n.type === 'TEXT') as TextNode[];
-	const ghostifyFrames = (e: any) => {
-			e.map((e: any) => {
-				(e.layoutMode = 'NONE'), (e.effects = []), (e.fills = []), (e.strokes = []);
-			});
+	n(t), (t = t.flat().filter((t) => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1)));
+	let o = [],
+		s = [],
+		r = [],
+		i = [];
+	for (const e of t)
+		'FRAME' === e.type && 'PAGE' !== e.parent.type
+			? o.push(e)
+			: 'BOOLEAN_OPERATION' === e.type ||
+			  'ELLIPSE' === e.type ||
+			  'LINE' === e.type ||
+			  'POLYGON' === e.type ||
+			  'RECTANGLE' === e.type ||
+			  'STAR' === e.type
+			? s.push(e)
+			: 'VECTOR' === e.type
+			? r.push(e)
+			: 'TEXT' === e.type && i.push(e);
+	const l = (t) => {
+			!1 === t.visible && t.remove();
 		},
-		ghostifyVector = (e: any) => {
-			e.map((s: any) => {
-				const t = figma.createRectangle();
-				t.resizeWithoutConstraints(s.width, s.height),
-					(t.cornerRadius = s.height),
-					(t.x = s.relativeTransform[0][2]),
-					(t.y = s.relativeTransform[1][2]),
-					(t.fills = fills),
-					s.parent.insertChild(s.parent.children.length, t),
-					s.remove();
-			});
-		},
-		ghostifyShapes = (e: any) => {
-			'BOOLEAN_OPERATION' === e.type && e.outlineStroke(),
-				e.map((e: any) => {
+		a = (t) => {
+			for (const e of t)
+				(e.layoutMode = 'NONE'),
 					(e.effects = []),
-						'IMAGE' === e.fills.type
-							? ((e.fills = []), (e.strokes = []))
-							: ((e.fills = fills), (e.strokes = fills));
-				});
+					(e.fills = []),
+					(e.strokes = []),
+					0 === e.children.length && e.remove();
+			l(t);
 		},
-		ghostifyText = async (f) => {
-			const fontLoadingPromises = f.map((t) => {
-				const a = t.getRangeFontName(0, 1);
-				return figma.loadFontAsync({
-					family: a.family,
-					style: a.style,
-				});
+		c = (t) => {
+			for (const e of t) {
+				const t = figma.createRectangle();
+				t.resizeWithoutConstraints(e.width, e.height),
+					(t.cornerRadius = e.height),
+					(t.x = e.relativeTransform[0][2]),
+					(t.y = e.relativeTransform[1][2]),
+					(t.fills = fills),
+					e.parent.insertChild(e.parent.children.length, t),
+					e.remove();
+			}
+			l(t);
+		},
+		f = (t) => {
+			for (const e of t)
+				'BOOLEAN_OPERATION' === e.type && e.outlineStroke(),
+					(e.effects = []),
+					'IMAGE' === e.fills.type
+						? ((e.fills = []), (e.strokes = []))
+						: ((e.fills = fills), (e.strokes = fills));
+			l(t);
+		},
+		h = async (t) => {
+			const e = t.map((t) => {
+				const e = t.getRangeFontName(0, 1);
+				return figma.loadFontAsync({ family: e.family, style: e.style });
 			});
-			await Promise.all(fontLoadingPromises);
-			f.forEach((e: any) => {
-				const w = e.getRangeFontName(0, 1);
-				'Symbol(figma.mixed)' === e.fontName.toString() && e.setRangeFontName(0, e.characters.length, w);
-				const getRandomArbitrary = (e, t) => Math.floor(Math.random() * (t - e) + e);
-				(e.textAutoResize = 'NONE'),
-					!0 === e.hasMissingFont &&
-						figma.closePlugin("You can't convert text until loading its source font.");
-				let t = Number(e.fontSize),
-					i = e.height,
-					r = e.lineHeight;
-				isNaN(r) && (r = 1.25 * t), (e.textAutoResize = i > r ? 'NONE' : 'WIDTH_AND_HEIGHT');
-				const n = Math.round(i / r);
-				for (let t = 0; t < n; t++) {
-					const i = figma.createRectangle();
-					e.height > r
-						? i.resizeWithoutConstraints(getRandomArbitrary(e.width / 2, e.width), (e.height, 0.7 * r))
-						: i.resizeWithoutConstraints(e.width, (e.height, 0.7 * r)),
-						(i.cornerRadius = r),
-						(i.x = e.relativeTransform[0][2]),
-						(i.y = e.relativeTransform[1][2] + r * t),
-						(i.fills = fills),
-						e.parent.insertChild(e.parent.children.length, i);
+			await Promise.all(e);
+			const n = [],
+				o = [];
+			for (const e of t) {
+				const t = e.characters,
+					o = e.parent,
+					s = e.getRangeTextStyleId(0, 1),
+					r = e.getRangeFontName(0, 1);
+				s ? (e.textStyleId = s) : (e.fontName = r);
+				const i = t
+					.split(/\r?\n/)
+					.filter(Boolean)
+					.map((t) => t.trim());
+				let l = 0;
+				for (let t = 0; t < i.length; t++) {
+					const s = e.clone();
+					(s.characters = i[t]),
+						(s.y = s.y + l),
+						(s.textAutoResize = 'HEIGHT'),
+						(l += s.height),
+						o.appendChild(s),
+						n.push(s);
 				}
 				e.remove();
-			});
+			}
+			for (const t of n) {
+				const e = t.getRangeFontName(0, 1);
+				'Symbol(figma.mixed)' === t.fontName.toString() && t.setRangeFontName(0, t.characters.length, e);
+				const n = (t, e) => Math.floor(Math.random() * (e - t) + t);
+				(t.textAutoResize = 'NONE'),
+					!0 === t.hasMissingFont &&
+						figma.closePlugin("You can't convert text until loading its source font.");
+				let s = Number(t.fontSize),
+					r = t.height,
+					i = t.lineHeight;
+				isNaN(i) && (i = 1.25 * s), (t.textAutoResize = r > i ? 'NONE' : 'WIDTH_AND_HEIGHT');
+				const l = Math.round(r / i);
+				for (let e = 0; e < l; e++) {
+					const s = figma.createRectangle();
+					t.height > i
+						? s.resizeWithoutConstraints(n(t.width / 2, t.width), 0.7 * i)
+						: s.resizeWithoutConstraints(t.width, 0.7 * i),
+						(s.cornerRadius = i),
+						(s.x = t.relativeTransform[0][2]),
+						(s.y = t.relativeTransform[1][2] + i * e),
+						(s.fills = fills),
+						t.parent.insertChild(t.parent.children.length, s),
+						o.push(s);
+				}
+				t.remove();
+			}
+			l(t);
 		};
-
 	(async () => {
 		try {
-			await Promise.all([
-				ghostifyText(text),
-				ghostifyFrames(frames),
-				ghostifyVector(vectors),
-				ghostifyShapes(shapes),
-			]),
-				console.clear(),
-				figma.closePlugin('Selection ghostified 👻.');
-		} catch (e) {
-			console.error(e), figma.closePlugin(`Error occurred: ${e.message}`);
+			await Promise.all([h(i), a(o), c(r), f(s)]), figma.closePlugin('Selection ghostified 👻.');
+		} catch (t) {
+			console.error(t), figma.closePlugin('Error occurred');
 		}
 	})();
 });
