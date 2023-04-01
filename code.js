@@ -2,10 +2,10 @@ let type = ['Solid', 'Linear Gradient'], colors = ['Gray', 'Black', 'White'], fi
 figma.parameters.on('input', ({ key, query, result }) => {
     switch (key) {
         case 'type':
-            result.setSuggestions(type.filter((s) => s.includes(query)));
+            result.setSuggestions(type.filter(s => s.includes(query)));
             break;
         case 'color':
-            result.setSuggestions(colors.filter((s) => s.includes(query)));
+            result.setSuggestions(colors.filter(s => s.includes(query)));
             break;
         default:
             return;
@@ -162,11 +162,11 @@ figma.on('run', ({ parameters }) => {
         if (0 === r.length)
             return t.flat();
         const i = r.map((t) => t.detachInstance());
-        e(i, s), t.push(...s.flat().filter((t) => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1)));
-        const l = s.flat().filter((t) => 'INSTANCE' === t.type && 'I' !== t.id.substr(0, 1));
+        e(i, s), t.push(...s.flat().filter(t => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1)));
+        const l = s.flat().filter(t => 'INSTANCE' === t.type && 'I' !== t.id.substr(0, 1));
         return n(l);
     };
-    n(t), (t = t.flat().filter((t) => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1)));
+    n(t), (t = t.flat().filter(t => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1)));
     let o = [], s = [], r = [], i = [];
     for (const e of t)
         'FRAME' === e.type && 'PAGE' !== e.parent.type
@@ -238,17 +238,11 @@ figma.on('run', ({ parameters }) => {
         }
         for (const t of n) {
             const e = t.getRangeFontName(0, 1);
-            if ('Symbol(figma.mixed)' === t.fontName.toString()) {
-                t.setRangeFontName(0, t.characters.length, e);
-            }
-            t.textAutoResize = 'NONE';
-            if (t.hasMissingFont) {
-                figma.closePlugin('You can’t convert text until loading its source font.');
-            }
+            'Symbol(figma.mixed)' === t.fontName.toString() && t.setRangeFontName(0, t.characters.length, e),
+                (t.textAutoResize = 'NONE'),
+                t.hasMissingFont && figma.closePlugin('You can’t convert text until loading its source font.');
             let n = Number(t.fontSize), i = t.height, a = t.lineHeight;
-            if (isNaN(a)) {
-                a = 1.2 * n;
-            }
+            isNaN(a) && (a = 1.2 * n);
             t.textAutoResize = i > a ? 'NONE' : 'WIDTH_AND_HEIGHT';
             const r = Math.round(i / a), s = t.parent.children.length;
             for (let e = 0; e < r; e++) {
@@ -268,7 +262,7 @@ figma.on('run', ({ parameters }) => {
     };
     (async () => {
         try {
-            const e = (await Promise.allSettled([h(i), a(o), c(r), f(s)])).filter((r) => 'rejected' === r.status);
+            const e = (await Promise.allSettled([h(i), a(o), c(r), f(s)])).filter(r => 'rejected' === r.status);
             e.length
                 ? (console.error(e), figma.closePlugin('Error occurred'))
                 : figma.closePlugin('Selection ghostified 👻.');
