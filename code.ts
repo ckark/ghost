@@ -111,12 +111,7 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
 				!1 === e.visible && e.remove();
 			},
 			f = (e: any) => {
-				for (const t of e)
-					(t.layoutMode = 'NONE'),
-						(t.effects = []),
-						(t.fills = []),
-						(t.strokes = []),
-						0 === t.children.length && t.remove();
+				for (const t of e) (t.layoutMode = 'NONE'), 0 === t.children.length && t.remove();
 				c(e);
 			},
 			g = (t: any) => {
