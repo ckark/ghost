@@ -72,42 +72,44 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
 						],
 					},
 				]);
-		let o = [];
-		const r = (e: any, t: any) => {
-			const o = (function* e(t) {
-				for (const o of t) yield o, o.children && (yield* e(o.children));
-			})(e);
-			for (let e = o.next(); !e.done; e = o.next()) t.push(e.value);
-		};
-		r(figma.currentPage.selection, o), (o = o.flat());
-		const n = (e: any) => {
-			let t = [];
-			const i = e.filter((e: any) => 'INSTANCE' === e.type && 'I' !== e.id.substr(0, 1));
-			if (0 === i.length) return o.flat();
-			const s = i.map(e => e.detachInstance());
-			r(s, t), o.push(...t.flat().filter((e: any) => 'INSTANCE' !== e.type && 'I' !== e.id.substr(0, 1)));
-			const a = t.flat().filter((e: any) => 'INSTANCE' === e.type && 'I' !== e.id.substr(0, 1));
-			return n(a);
-		};
-		n(o), (o = o.flat().filter(e => 'INSTANCE' !== e.type && 'I' !== e.id.substr(0, 1)));
-		let i = [],
+		let o = [],
+			i = [],
 			s = [],
 			a = [],
 			l = [];
-		for (const e of o)
-			'FRAME' === e.type && 'PAGE' !== e.parent.type
-				? i.push(e)
-				: 'BOOLEAN_OPERATION' === e.type ||
-				  'ELLIPSE' === e.type ||
-				  'LINE' === e.type ||
-				  'POLYGON' === e.type ||
-				  'RECTANGLE' === e.type ||
-				  'STAR' === e.type
-				? s.push(e)
-				: 'VECTOR' === e.type
-				? a.push(e)
-				: 'TEXT' === e.type && l.push(e);
-		const c = e => {
+		const z = async (e: any) => {
+			const r = (e: any, t: any) => {
+				const o = (function* e(t) {
+					for (const o of t) yield o, o.children && (yield* e(o.children));
+				})(e);
+				for (let e = o.next(); !e.done; e = o.next()) t.push(e.value);
+			};
+			r(e, o), (o = o.flat());
+			const n = (e: any) => {
+				let t = [];
+				const i = e.filter((e: any) => 'INSTANCE' === e.type && 'I' !== e.id.substr(0, 1));
+				if (0 === i.length) return o.flat();
+				const s = i.map(e => e.detachInstance());
+				r(s, t), o.push(...t.flat().filter((e: any) => 'INSTANCE' !== e.type && 'I' !== e.id.substr(0, 1)));
+				const a = t.flat().filter((e: any) => 'INSTANCE' === e.type && 'I' !== e.id.substr(0, 1));
+				return n(a);
+			};
+			n(o), (o = o.flat().filter(e => 'INSTANCE' !== e.type && 'I' !== e.id.substr(0, 1)));
+			for (const e of o)
+				'FRAME' === e.type && 'PAGE' !== e.parent.type
+					? i.push(e)
+					: 'BOOLEAN_OPERATION' === e.type ||
+					  'ELLIPSE' === e.type ||
+					  'LINE' === e.type ||
+					  'POLYGON' === e.type ||
+					  'RECTANGLE' === e.type ||
+					  'STAR' === e.type
+					? s.push(e)
+					: 'VECTOR' === e.type
+					? a.push(e)
+					: 'TEXT' === e.type && l.push(e);
+		};
+		const c = (e: any) => {
 				!1 === e.visible && e.remove();
 			},
 			f = (e: any) => {
@@ -199,6 +201,7 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
 		(async () => {
 			try {
 				const e = Date.now();
+				await Promise.all([z(figma.currentPage.selection)]);
 				await Promise.all([h(l), f(i), g(a), p(s)]);
 				const t = (Date.now() - e) / 1e3;
 				console.clear(), figma.closePlugin(`Selection ghostified 👻 in ${t} seconds.`);
