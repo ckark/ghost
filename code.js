@@ -190,7 +190,7 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
             try {
                 const e = Date.now();
                 await Promise.all([z(figma.currentPage.selection)]);
-                await Promise.all([h(l), f(i), g(a), p(s)]);
+                await Promise.all([f(i), g(a), p(s), h(l)]);
                 const t = (Date.now() - e) / 1e3;
                 console.clear(), figma.closePlugin(`Selection ghostified 👻 in ${t} seconds.`);
             }
