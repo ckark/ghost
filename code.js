@@ -93,7 +93,7 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
             };
             n(o), (o = o.flat().filter(e => 'INSTANCE' !== e.type && 'I' !== e.id.substr(0, 1)));
             for (const e of o)
-                'FRAME' === e.type && 'PAGE' !== e.parent.type
+                'FRAME' === e.type
                     ? i.push(e)
                     : 'BOOLEAN_OPERATION' === e.type ||
                         'ELLIPSE' === e.type ||
