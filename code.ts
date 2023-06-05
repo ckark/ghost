@@ -3,11 +3,11 @@ let e,
 	o = ['Gray', 'Black', 'White'];
 figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
 	switch (e) {
-		case 'type':
-			n.setSuggestions(t.filter(e => e.includes(r)));
-			break;
 		case 'color':
 			n.setSuggestions(o.filter(e => e.includes(r)));
+			break;
+		case 'type':
+			n.setSuggestions(t.filter(e => e.includes(r)));
 			break;
 		default:
 			return;
@@ -148,7 +148,6 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
 				await Promise.all(o);
 				const r = [],
 					n = [];
-
 				for (const e of t) {
 					const t = e.characters,
 						o = e.parent,

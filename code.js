@@ -1,11 +1,11 @@
 let e, t = ['Solid', 'Linear Gradient'], o = ['Gray', 'Black', 'White'];
 figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
     switch (e) {
-        case 'type':
-            n.setSuggestions(t.filter(e => e.includes(r)));
-            break;
         case 'color':
             n.setSuggestions(o.filter(e => e.includes(r)));
+            break;
+        case 'type':
+            n.setSuggestions(t.filter(e => e.includes(r)));
             break;
         default:
             return;
