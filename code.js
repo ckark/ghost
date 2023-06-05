@@ -151,6 +151,7 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
                 let a = 0;
                 for (const t of s) {
                     const n = e.clone();
+                    'TOP' !== n.textAlignVertical && (n.textAlignVertical = 'TOP');
                     (n.characters = t),
                         (n.y += a),
                         (n.textAutoResize = 'HEIGHT'),
