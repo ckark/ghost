@@ -70,28 +70,45 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
                         ],
                     },
                 ]);
-        let o = [], i = [], s = [], a = [], l = [];
-        const z = async (e) => {
-            const r = (e, t) => {
-                const o = (function* e(t) {
-                    for (const o of t)
-                        yield o, o.children && (yield* e(o.children));
-                })(e);
-                for (let e = o.next(); !e.done; e = o.next())
-                    t.push(e.value);
+        let o = [], i = [], s = [], a = [], l = [], b = [];
+        const r = (e, t) => {
+            const o = (function* e(t) {
+                for (const o of t)
+                    yield o, o.children && (yield* e(o.children));
+            })(e);
+            for (let e = o.next(); !e.done; e = o.next())
+                t.push(e.value);
+        }, c = (e) => {
+            const t = e.filter(n => !1 === n.visible);
+            r(t, b), (b = b.flat());
+            const n = new Set(b);
+            for (let t = 0; t < e.length;)
+                n.has(e[t]) ? e.splice(t, 1) : t++;
+            const l = (n) => {
+                try {
+                    if ('children' in e)
+                        for (const t of e.children)
+                            l(t);
+                    n.remove();
+                }
+                catch (t) {
+                    return n;
+                }
             };
+            for (const e of b)
+                l(e);
+            return e;
+        }, n = (e) => {
+            const t = [], i = e.filter((e) => 'INSTANCE' === e.type && 'I' !== e.id.substr(0, 1));
+            if (0 === i.length)
+                return o.flat();
+            const s = i.map(e => e.detachInstance());
+            r(s, t), o.push(...t.flat().filter((e) => 'INSTANCE' !== e.type && 'I' !== e.id.substr(0, 1)));
+            const a = t.flat().filter((e) => 'INSTANCE' === e.type && 'I' !== e.id.substr(0, 1));
+            return n(a);
+        }, z = async (e) => {
             r(e, o), (o = o.flat());
-            const n = (e) => {
-                let t = [];
-                const i = e.filter((e) => 'INSTANCE' === e.type && 'I' !== e.id.substr(0, 1));
-                if (0 === i.length)
-                    return o.flat();
-                const s = i.map(e => e.detachInstance());
-                r(s, t), o.push(...t.flat().filter((e) => 'INSTANCE' !== e.type && 'I' !== e.id.substr(0, 1)));
-                const a = t.flat().filter((e) => 'INSTANCE' === e.type && 'I' !== e.id.substr(0, 1));
-                return n(a);
-            };
-            n(o), (o = o.flat().filter(e => 'INSTANCE' !== e.type && 'I' !== e.id.substr(0, 1)));
+            n(o), (o = o.flat().filter(e => 'INSTANCE' !== e.type && 'I' !== e.id.substr(0, 1))), (o = c(o));
             for (const e of o)
                 'FRAME' === e.type
                     ? i.push(e)
@@ -105,37 +122,31 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
                         : 'VECTOR' === e.type
                             ? a.push(e)
                             : 'TEXT' === e.type && l.push(e);
-        };
-        const c = (e) => {
-            !1 === e.visible && e.remove();
-        }, f = (e) => {
+        }, f = async (e) => {
             for (const t of e)
                 (t.layoutMode = 'NONE'), (t.strokes = []), 0 === t.children.length && t.remove();
-            c(e);
-        }, g = (t) => {
+        }, g = async (t) => {
             for (const o of t) {
-                const t = figma.createRectangle();
+                const b = figma.createRectangle();
                 o.height <= 0.01
-                    ? t.resizeWithoutConstraints(o.width, 0.01)
-                    : t.resizeWithoutConstraints(o.width, o.height),
-                    (t.cornerRadius = o.height),
-                    (t.x = o.relativeTransform[0][2]),
-                    (t.y = o.relativeTransform[1][2]),
-                    (t.fills = e),
-                    o.parent.insertChild(o.parent.children.length, t),
+                    ? b.resizeWithoutConstraints(o.width, 0.01)
+                    : b.resizeWithoutConstraints(o.width, o.height),
+                    (b.cornerRadius = o.height),
+                    (b.x = o.relativeTransform[0][2]),
+                    (b.y = o.relativeTransform[1][2]),
+                    (b.fills = e),
+                    o.parent.insertChild(o.parent.children.length, b),
                     o.remove();
             }
-            c(t);
-        }, p = (t) => {
+        }, p = async (t) => {
             for (const o of t)
                 'BOOLEAN_OPERATION' === o.type && o.outlineStroke(),
                     (o.effects = []),
                     'IMAGE' === o.fills.type
                         ? ((o.fills = []), (o.strokes = []))
                         : ((o.fills = e), (o.strokes = e));
-            c(t);
         }, h = async (t) => {
-            const o = t.map(e => {
+            const o = t.map((e) => {
                 const t = e.getRangeFontName(0, 1);
                 return figma.loadFontAsync({ family: t.family, style: t.style });
             });
@@ -185,13 +196,15 @@ figma.parameters.on('input', ({ key: e, query: r, result: n }) => {
                 }
                 t.remove();
             }
-            c(t);
         };
         (async () => {
             try {
                 const e = Date.now();
-                await Promise.all([z(figma.currentPage.selection)]);
-                await Promise.all([f(i), g(a), p(s), h(l)]);
+                await z(figma.currentPage.selection);
+                await f(i);
+                await p(s);
+                await g(a);
+                await h(l);
                 const t = (Date.now() - e) / 1e3;
                 console.clear(), figma.closePlugin(`Selection ghostified 👻 in ${t} seconds.`);
             }
