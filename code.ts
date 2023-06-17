@@ -15,10 +15,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 }),
 	figma.on('run', ({ parameters: e }) => {
 		0 === figma.currentPage.selection.length && (figma.notify('Select at least one item.'), figma.closePlugin()),
-			e &&
-				'Gray' === e.color &&
-				'Solid' === e.type &&
-				(t = [{ type: 'SOLID', color: { r: 0.9, g: 0.9, b: 0.9 } }]),
+			e && 'Gray' === e.color && 'Solid' === e.type && (t = [{ type: 'SOLID', color: { r: 0.9, g: 0.9, b: 0.9 } }]),
 			'Gray' === e.color &&
 				'Linear Gradient' === e.type &&
 				(t = [
@@ -30,11 +27,21 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 						],
 						gradientStops: [
 							{
-								color: { r: 0.8588235378265381, g: 0.8588235378265381, b: 0.8588235378265381, a: 0.05 },
+								color: {
+									r: 0.8588235378265381,
+									g: 0.8588235378265381,
+									b: 0.8588235378265381,
+									a: 0.05,
+								},
 								position: 0,
 							},
 							{
-								color: { r: 0.8588235378265381, g: 0.8588235378265381, b: 0.8588235378265381, a: 1 },
+								color: {
+									r: 0.8588235378265381,
+									g: 0.8588235378265381,
+									b: 0.8588235378265381,
+									a: 1,
+								},
 								position: 0.5,
 							},
 						],
@@ -95,9 +102,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 			c = async (e: any) => {
 				for (const o of e) {
 					const e = figma.createRectangle();
-					o.height <= 0.01
-						? e.resizeWithoutConstraints(o.width, 0.01)
-						: e.resizeWithoutConstraints(o.width, o.height),
+					o.height <= 0.01 ? e.resizeWithoutConstraints(o.width, 0.01) : e.resizeWithoutConstraints(o.width, o.height),
 						(e.cornerRadius = o.height),
 						(e.x = o.relativeTransform[0][2]),
 						(e.y = o.relativeTransform[1][2]),
@@ -108,11 +113,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 			},
 			f = async (e: any) => {
 				for (const o of e)
-					'BOOLEAN_OPERATION' === o.type && o.outlineStroke(),
-						(o.effects = []),
-						'IMAGE' === o.fills.type
-							? ((o.fills = []), (o.strokes = []))
-							: ((o.fills = t), (o.strokes = t));
+					'BOOLEAN_OPERATION' === o.type && o.outlineStroke(), (o.effects = []), 'IMAGE' === o.fills.type ? ((o.fills = []), (o.strokes = [])) : ((o.fills = t), (o.strokes = t));
 			},
 			g = async (e: any) => {
 				const o = e.map(t => {
@@ -135,13 +136,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 					let s = 0;
 					for (const e of a) {
 						const n = t.clone();
-						'TOP' !== n.textAlignVertical && (n.textAlignVertical = 'TOP'),
-							(n.characters = e),
-							(n.y += s),
-							(n.textAutoResize = 'HEIGHT'),
-							(s += n.height),
-							o.appendChild(n),
-							r.push(n);
+						'TOP' !== n.textAlignVertical && (n.textAlignVertical = 'TOP'), (n.characters = e), (n.y += s), (n.textAutoResize = 'HEIGHT'), (s += n.height), o.appendChild(n), r.push(n);
 					}
 					t.remove();
 				}
@@ -149,9 +144,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 					const o = e.getRangeFontName(0, 1);
 					'Symbol(figma.mixed)' === e.fontName.toString() && e.setRangeFontName(0, e.characters.length, o);
 					const r = (t: any, e: any) => Math.floor(Math.random() * (e - t) + t);
-					(e.textAutoResize = 'NONE'),
-						!0 === e.hasMissingFont &&
-							figma.closePlugin("You can't convert text until loading its source font.");
+					(e.textAutoResize = 'NONE'), !0 === e.hasMissingFont && figma.closePlugin("You can't convert text until loading its source font.");
 					let i = Number(e.fontSize),
 						a = e.height,
 						s = e.lineHeight;
@@ -159,9 +152,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 					const l = Math.round(a / s);
 					for (let o = 0; o < l; o++) {
 						const i = figma.createRectangle();
-						e.height > s
-							? i.resizeWithoutConstraints(r(e.width / 2, e.width), 0.7 * s)
-							: i.resizeWithoutConstraints(e.width, 0.7 * s),
+						e.height > s ? i.resizeWithoutConstraints(r(e.width / 2, e.width), 0.7 * s) : i.resizeWithoutConstraints(e.width, 0.7 * s),
 							(i.cornerRadius = s),
 							(i.x = e.relativeTransform[0][2]),
 							(i.y = e.relativeTransform[1][2] + s * o),
@@ -183,24 +174,13 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 						((t: any) => {
 							for (const e of t) e.removed || e.visible || e.remove();
 						})(o);
-					for (const t of o)
-						t.removed ||
-							('FRAME' === t.type
-								? r.push(t)
-								: 'BOOLEAN_OPERATION' === t.type ||
-								  'ELLIPSE' === t.type ||
-								  'LINE' === t.type ||
-								  'POLYGON' === t.type ||
-								  'RECTANGLE' === t.type ||
-								  'STAR' === t.type
-								? n.push(t)
-								: 'VECTOR' === t.type
-								? i.push(t)
-								: 'TEXT' === t.type && a.push(t));
+					const q = ['BOOLEAN_OPERATION', 'ELLIPSE', 'LINE', 'POLYGON', 'RECTANGLE', 'STAR'],
+						u = ['VECTOR'],
+						m = ['TEXT'];
+					for (const e of o) e.removed || ('FRAME' === e.type ? r.push(e) : q.includes(e.type) ? n.push(e) : u.includes(e.type) ? i.push(e) : m.includes(e.type) && a.push(e));
 				})(figma.currentPage.selection),
 					await (async (t: any) => {
-						for (const e of t)
-							(e.layoutMode = 'NONE'), (e.strokes = []), 0 === e.children.length && e.remove();
+						for (const e of t) (e.layoutMode = 'NONE'), (e.strokes = []), 0 === e.children.length && e.remove();
 					})(r),
 					await f(n),
 					await c(i),
