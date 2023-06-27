@@ -4,10 +4,10 @@ let t,
 figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 	switch (t) {
 		case 'color':
-			n.setSuggestions(o.filter(t => t.includes(r)));
+			n.setSuggestions(o.filter((t) => t.includes(r)));
 			break;
 		case 'type':
-			n.setSuggestions(e.filter(t => t.includes(r)));
+			n.setSuggestions(e.filter((t) => t.includes(r)));
 			break;
 		default:
 			return;
@@ -95,8 +95,8 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 					r = t.filter((t: any) => 'INSTANCE' === t.type && 'I' !== t.id.substr(0, 1));
 				if (0 === r.length) return o.flat();
 				const n = r.map((t: any) => t.detachInstance());
-				s(n, e), o.push(...e.flat().filter(t => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1)));
-				const i = e.flat().filter(t => 'INSTANCE' === t.type && 'I' !== t.id.substr(0, 1));
+				s(n, e), o.push(...e.flat().filter((t) => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1)));
+				const i = e.flat().filter((t) => 'INSTANCE' === t.type && 'I' !== t.id.substr(0, 1));
 				return l(i);
 			},
 			c = async (e: any) => {
@@ -116,7 +116,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 					'BOOLEAN_OPERATION' === o.type && o.outlineStroke(), (o.effects = []), 'IMAGE' === o.fills.type ? ((o.fills = []), (o.strokes = [])) : ((o.fills = t), (o.strokes = t));
 			},
 			g = async (e: any) => {
-				const o = e.map(t => {
+				const o = e.map((t: any) => {
 					const e = t.getRangeFontName(0, 1);
 					return figma.loadFontAsync({ family: e.family, style: e.style });
 				});
@@ -132,7 +132,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 					const a = e
 						.split(/\r?\n/)
 						.filter(Boolean)
-						.map(t => t.trim());
+						.map((t) => t.trim());
 					let s = 0;
 					for (const e of a) {
 						const n = t.clone();
@@ -170,7 +170,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 					s(t, o),
 						(o = o.flat()),
 						l(o),
-						(o = o.flat().filter(t => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1))),
+						(o = o.flat().filter((t) => 'INSTANCE' !== t.type && 'I' !== t.id.substr(0, 1))),
 						((t: any) => {
 							for (const e of t) e.removed || e.visible || e.remove();
 						})(o);
