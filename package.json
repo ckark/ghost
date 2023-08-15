@@ -4,7 +4,8 @@
 	"description": "Turn your designs into skeletons or placeholders in a jiffy.",
 	"main": "code.js",
 	"scripts": {
-		"build": "tsc -p tsconfig.json"
+		"build": "tsc -p tsconfig.json",
+    "watch": "npm run build -- --watch"
 	},
 	"author": "Chris Kark",
 	"license": "MIT",
