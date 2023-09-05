@@ -4,8 +4,11 @@ Ghost is a lightweight plugin that converts high fidelity mockups to loading or 
 
 ## How it Works
 
-Ghost detects all text and shape layers (rectangles, ellipses, vectors, frames, etc.) selected. It then measures their dimensions before replacing them with rectangles; the original layers are removed.
-To general a layout faithful to the original, Ghost removes auto-layout, thereby preventing some of the anomalies that occur when inserting children into frames.
+Ghost recursively detects all nodes in a selection. It then measures their dimensions before replacing them with shapes; the original layers are removed. To generate a layout faithful to the original, Ghost removes properties like auto-layout, effects, strokes, and fills, thereby preventing anomalies that occur when inserting placeholder shapes onto the canvas.
+
+### A Note on Frames
+
+Since a frame has varied uses—creating components (e.g., buttons, toggle switches, etc.) and containers (e.g., cards and screens)—altering or removing its background color may prove disruptive. Accordingly, Ghost instead detaches and retains each frame's background color while removing strokes and effects.
 
 ## Basic Usage
 
@@ -19,9 +22,7 @@ Loading is a state specific design akin to `disabled` or `destructive`, `hover` 
 
 ## Roadmap
 
--   Color picker—depending on whether Figma’s new input parameters add support for HTML-like inputs like `input type=color`.
--   Linear gradients for a sheen effect.
--   Convert one or more directly selected instances.
+A color picker—depending on whether Figma’s new input parameters add support for HTML-like inputs like `input type=color`.
 
 ## End Notes
 
