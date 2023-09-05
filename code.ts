@@ -188,7 +188,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 									s = r.gradientStops;
 								(o.fills = []), (o.fills = 'SOLID' === e ? [{ type: e, color: t }] : 'GRADIENT_LINEAR' === e ? [{ type: e, gradientTransform: l, gradientStops: s }] : []);
 							}
-							(o.layoutMode = 'NONE'), (o.strokes = []), 0 === o.children.length && o.remove();
+							(o.layoutMode = 'NONE'), (o.strokes = []), (o.effects = []), 0 === o.children.length && o.remove();
 						}
 					})(r),
 					await f(n),
