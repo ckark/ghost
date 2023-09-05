@@ -151,7 +151,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
         };
         (async () => {
             try {
-                const t = Date.now();
+                const z = Date.now();
                 await (async (t) => {
                     s(t, o),
                         (o = o.flat()),
@@ -165,19 +165,24 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
                     for (const e of o)
                         e.removed || ('FRAME' === e.type ? r.push(e) : q.includes(e.type) ? n.push(e) : u.includes(e.type) ? i.push(e) : m.includes(e.type) && a.push(e));
                 })(figma.currentPage.selection),
-                    await (async (t) => {
-                        for (const e of t)
-                            (e.layoutMode = 'NONE'), (e.strokes = []), 0 === e.children.length && e.remove();
+                    await (async (r) => {
+                        for (const o of r) {
+                            for (const r of o.fills) {
+                                let t = r.color, e = r.type, l = r.gradientTransform, s = r.gradientStops;
+                                (o.fills = []), (o.fills = 'SOLID' === e ? [{ type: e, color: t }] : 'GRADIENT_LINEAR' === e ? [{ type: e, gradientTransform: l, gradientStops: s }] : []);
+                            }
+                            (o.layoutMode = 'NONE'), (o.strokes = []), 0 === o.children.length && o.remove();
+                        }
                     })(r),
                     await f(n),
                     await c(i),
                     await g(a);
-                const e = (Date.now() - t) / 1e3;
+                const e = (Date.now() - z) / 1e3;
                 console.clear();
                 figma.closePlugin(`Selection ghostified 👻 in ${e} seconds.`);
             }
-            catch (t) {
-                console.error(t), figma.closePlugin('Error occurred');
+            catch (z) {
+                console.error(z), figma.closePlugin('Error occurred');
             }
         })();
     });
