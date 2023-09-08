@@ -165,6 +165,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 			};
 		(async () => {
 			try {
+				let y: number;
 				const z = Date.now();
 				await (async (t: any) => {
 					s(t, o),
@@ -174,6 +175,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 						((t: any) => {
 							for (const e of t) e.removed || e.visible || e.remove();
 						})(o);
+					y = o.length;
 					const q = ['BOOLEAN_OPERATION', 'ELLIPSE', 'LINE', 'POLYGON', 'RECTANGLE', 'STAR'],
 						u = ['VECTOR'],
 						m = ['TEXT'];
@@ -196,7 +198,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 					await g(a);
 				const e = (Date.now() - z) / 1e3;
 				console.clear();
-				figma.closePlugin(`Selection ghostified 👻 in ${e} seconds.`);
+				figma.closePlugin(`Ghostified 👻 ${y} nodes in in ${e} seconds.`);
 			} catch (z) {
 				console.error(z), figma.closePlugin('Error occurred');
 			}
