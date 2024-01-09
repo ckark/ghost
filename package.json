@@ -5,7 +5,7 @@
 	"main": "code.js",
 	"scripts": {
 		"build": "tsc -p tsconfig.json",
-    "watch": "npm run build -- --watch"
+		"watch": "npm run build -- --watch"
 	},
 	"author": "Chris Kark",
 	"license": "MIT",
