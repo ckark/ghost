@@ -2,6 +2,7 @@
 	"name": "Ghost",
 	"id": "1017135840453013129",
 	"api": "1.0.0",
+	"documentAccess": "dynamic-page",
 	"main": "code.js",
 	"editorType": ["figma"],
 	"parameterOnly": true,
