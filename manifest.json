@@ -5,6 +5,9 @@
 	"documentAccess": "dynamic-page",
 	"main": "code.js",
 	"editorType": ["figma"],
+	"networkAccess": {
+		"allowedDomains": ["none"]
+	},
 	"parameterOnly": true,
 	"parameters": [
 		{
