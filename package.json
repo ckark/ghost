@@ -10,14 +10,14 @@
 	"author": "Chris Kark",
 	"license": "MIT",
 	"devDependencies": {
-		"@figma/eslint-plugin-figma-plugins": "^0.14.0",
-		"@figma/plugin-typings": "^1.87.0",
-		"@typescript-eslint/eslint-plugin": "^7.1.0",
-		"@typescript-eslint/parser": "^7.1.0",
-		"eslint": "^8.57.0",
-		"typescript": "^5.3.3"
+		"@figma/eslint-plugin-figma-plugins": "^0.16.1",
+		"@figma/plugin-typings": "^1.119.0",
+		"@typescript-eslint/eslint-plugin": "^8.46.2",
+		"@typescript-eslint/parser": "^8.46.2",
+		"eslint": "^9.39.0",
+		"typescript": "^5.9.3"
 	},
 	"dependencies": {
-		"prettier": "*"
+		"prettier": "^3.6.2"
 	}
 }

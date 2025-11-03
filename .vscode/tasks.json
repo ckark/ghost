@@ -1,0 +1,24 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "watch-tsconfig.json",
+			"type": "shell",
+			"command": "npx",
+			"args": ["tsc", "-p", "tsconfig.json", "--watch"],
+			"problemMatcher": "$tsc-watch",
+			"isBackground": true,
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			},
+			"group": {
+				"kind": "build"
+			}
+		}
+	]
+}
+
