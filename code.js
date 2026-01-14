@@ -44,6 +44,13 @@ const colorConfig = {
         ],
     },
 };
+const safeRemove = (node) => {
+    try {
+        if (!node.removed)
+            node.remove();
+    }
+    catch (_a) { }
+};
 figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
     switch (t) {
         case 'color':
@@ -114,7 +121,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
                     rect.y = transform[1][2];
                     rect.fills = t;
                     vec.parent.appendChild(rect);
-                    vec.remove();
+                    safeRemove(vec);
                 }
             }, f = async (shapes) => {
                 if (shapes.length === 0)
@@ -175,7 +182,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
                         textNode.parent.appendChild(cloned);
                         splitTexts.push(cloned);
                     }
-                    textNode.remove();
+                    safeRemove(textNode);
                 }
                 for (const textNode of splitTexts) {
                     if (textNode.hasMissingFont) {
@@ -207,7 +214,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
                         rect.fills = t;
                         textNode.parent.appendChild(rect);
                     }
-                    textNode.remove();
+                    safeRemove(textNode);
                 }
             };
             (async () => {
@@ -218,12 +225,8 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
                     const instances = [];
                     for (let idx = 0; idx < o.length; idx++) {
                         const node = o[idx];
-                        if (node.removed)
+                        if (node.removed || !node.visible)
                             continue;
-                        if (!node.visible) {
-                            node.remove();
-                            continue;
-                        }
                         if (node.type === 'INSTANCE' && node.id[0] !== 'I') {
                             instances.push(node);
                         }
@@ -257,7 +260,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
                         frame.strokes = [];
                         frame.effects = [];
                         if (frame.children.length === 0) {
-                            frame.remove();
+                            safeRemove(frame);
                         }
                     }
                     await Promise.all([f(n), c(i), g(a)]);

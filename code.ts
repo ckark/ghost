@@ -46,6 +46,11 @@ const colorConfig: Record<string, Record<string, any>> = {
 		],
 	},
 };
+const safeRemove = (node: any) => {
+	try {
+		if (!node.removed) node.remove();
+	} catch {}
+};
 figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 	switch (t) {
 		case 'color':
@@ -115,7 +120,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 						rect.y = transform[1][2];
 						rect.fills = t;
 						vec.parent.appendChild(rect);
-						vec.remove();
+						safeRemove(vec);
 					}
 				},
 				f = async (shapes: any[]) => {
@@ -170,7 +175,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 							textNode.parent.appendChild(cloned);
 							splitTexts.push(cloned);
 						}
-						textNode.remove();
+						safeRemove(textNode);
 					}
 					for (const textNode of splitTexts) {
 						if (textNode.hasMissingFont) {
@@ -201,7 +206,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 							rect.fills = t;
 							textNode.parent.appendChild(rect);
 						}
-						textNode.remove();
+						safeRemove(textNode);
 					}
 				};
 			(async () => {
@@ -212,11 +217,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 					const instances: any[] = [];
 					for (let idx = 0; idx < o.length; idx++) {
 						const node = o[idx];
-						if (node.removed) continue;
-						if (!node.visible) {
-							node.remove();
-							continue;
-						}
+						if (node.removed || !node.visible) continue;
 						if (node.type === 'INSTANCE' && node.id[0] !== 'I') {
 							instances.push(node);
 						}
@@ -245,7 +246,7 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 						frame.strokes = [];
 						frame.effects = [];
 						if (frame.children.length === 0) {
-							frame.remove();
+							safeRemove(frame);
 						}
 					}
 					await Promise.all([f(n), c(i), g(a)]);
