@@ -80,31 +80,26 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 				n = [],
 				i = [],
 				a = [];
-			const s = (nodes: readonly any[], result: any[]) => {
+			const collectNodes = (nodes: readonly any[], result: any[]) => {
 					for (const node of nodes) {
 						if (node.removed) continue;
 						result.push(node);
 						if (node.children?.length) {
-							s(node.children, result);
+							collectNodes(node.children, result);
 						}
 					}
 				},
-				l = (instances: any[]) => {
-					if (instances.length === 0) return;
-					const detached: any[] = [];
-					for (const inst of instances) {
-						if (inst.type === 'INSTANCE' && inst.id[0] !== 'I') {
-							detached.push(inst.detachInstance());
+				detachAllInstances = (nodes: readonly any[]) => {
+					for (const node of nodes) {
+						if (node.removed) continue;
+						if (node.type === 'INSTANCE' && node.id[0] !== 'I') {
+							const detached = node.detachInstance();
+							if (detached.children?.length) {
+								detachAllInstances(detached.children);
+							}
+						} else if (node.children?.length) {
+							detachAllInstances(node.children);
 						}
-					}
-					if (detached.length === 0) return;
-					const newNodes: any[] = [];
-					s(detached, newNodes);
-					const validNodes = newNodes.filter((t) => t.type !== 'INSTANCE' && t.id[0] !== 'I');
-					o.push(...validNodes);
-					const remainingInstances = newNodes.filter((t) => t.type === 'INSTANCE' && t.id[0] !== 'I');
-					if (remainingInstances.length > 0) {
-						l(remainingInstances);
 					}
 				},
 				c = async (vectors: any[]) => {
@@ -213,19 +208,9 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
 				try {
 					const startTime = Date.now();
 					const selection = figma.currentPage.selection;
-					s(selection, o);
-					const instances: any[] = [];
-					for (let idx = 0; idx < o.length; idx++) {
-						const node = o[idx];
-						if (node.removed || !node.visible) continue;
-						if (node.type === 'INSTANCE' && node.id[0] !== 'I') {
-							instances.push(node);
-						}
-					}
-					if (instances.length > 0) {
-						l(instances);
-					}
-					o = o.filter((node) => node.type !== 'INSTANCE' && node.id[0] !== 'I' && !node.removed);
+					detachAllInstances(selection);
+					collectNodes(selection, o);
+					o = o.filter((node) => !node.removed && node.visible && node.type !== 'INSTANCE');
 					const nodeCount = o.length;
 					const shapeTypes = new Set(['BOOLEAN_OPERATION', 'ELLIPSE', 'LINE', 'POLYGON', 'RECTANGLE', 'STAR']);
 					for (const node of o) {

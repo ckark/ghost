@@ -77,34 +77,30 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
                 t = (_a = colorConfig[e.color]) === null || _a === void 0 ? void 0 : _a[e.type];
             }
             let o = [], r = [], n = [], i = [], a = [];
-            const s = (nodes, result) => {
+            const collectNodes = (nodes, result) => {
                 var _a;
                 for (const node of nodes) {
                     if (node.removed)
                         continue;
                     result.push(node);
                     if ((_a = node.children) === null || _a === void 0 ? void 0 : _a.length) {
-                        s(node.children, result);
+                        collectNodes(node.children, result);
                     }
                 }
-            }, l = (instances) => {
-                if (instances.length === 0)
-                    return;
-                const detached = [];
-                for (const inst of instances) {
-                    if (inst.type === 'INSTANCE' && inst.id[0] !== 'I') {
-                        detached.push(inst.detachInstance());
+            }, detachAllInstances = (nodes) => {
+                var _a, _b;
+                for (const node of nodes) {
+                    if (node.removed)
+                        continue;
+                    if (node.type === 'INSTANCE' && node.id[0] !== 'I') {
+                        const detached = node.detachInstance();
+                        if ((_a = detached.children) === null || _a === void 0 ? void 0 : _a.length) {
+                            detachAllInstances(detached.children);
+                        }
                     }
-                }
-                if (detached.length === 0)
-                    return;
-                const newNodes = [];
-                s(detached, newNodes);
-                const validNodes = newNodes.filter((t) => t.type !== 'INSTANCE' && t.id[0] !== 'I');
-                o.push(...validNodes);
-                const remainingInstances = newNodes.filter((t) => t.type === 'INSTANCE' && t.id[0] !== 'I');
-                if (remainingInstances.length > 0) {
-                    l(remainingInstances);
+                    else if ((_b = node.children) === null || _b === void 0 ? void 0 : _b.length) {
+                        detachAllInstances(node.children);
+                    }
                 }
             }, c = async (vectors) => {
                 if (vectors.length === 0)
@@ -221,20 +217,9 @@ figma.parameters.on('input', ({ key: t, query: r, result: n }) => {
                 try {
                     const startTime = Date.now();
                     const selection = figma.currentPage.selection;
-                    s(selection, o);
-                    const instances = [];
-                    for (let idx = 0; idx < o.length; idx++) {
-                        const node = o[idx];
-                        if (node.removed || !node.visible)
-                            continue;
-                        if (node.type === 'INSTANCE' && node.id[0] !== 'I') {
-                            instances.push(node);
-                        }
-                    }
-                    if (instances.length > 0) {
-                        l(instances);
-                    }
-                    o = o.filter((node) => node.type !== 'INSTANCE' && node.id[0] !== 'I' && !node.removed);
+                    detachAllInstances(selection);
+                    collectNodes(selection, o);
+                    o = o.filter((node) => !node.removed && node.visible && node.type !== 'INSTANCE');
                     const nodeCount = o.length;
                     const shapeTypes = new Set(['BOOLEAN_OPERATION', 'ELLIPSE', 'LINE', 'POLYGON', 'RECTANGLE', 'STAR']);
                     for (const node of o) {
